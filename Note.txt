@@ -1,0 +1,8 @@
+Create user admin
+php artisan make:filament-user
+php artisan tinker
+$user = \App\Models\User::where('email', 'emailkamu@contoh.com')->first();
+$user->role = 'admin';
+$user->save();
+$user->role();
+
