@@ -20,14 +20,13 @@ class PendaftaranMagangController extends Controller
         // 1. Validasi input dasar
         $validated = $request->validate([
             'nama_lengkap'    => 'required|string|max:255',
+            'agency'          => 'required|string|max:255',
             'nim'             => 'nullable|string|max:50',
             'email'           => 'required|email|max:255',
             'no_hp'           => 'nullable|string|max:30',
 
             // file wajib pdf max 2MB
             'cv'              => 'required|file|mimes:pdf|max:2048',
-            'surat_pengantar' => 'required|file|mimes:pdf|max:2048',
-            'ktm'             => 'required|file|mimes:pdf|max:2048',
 
             // periode magang
             'tipe_periode'    => 'required|in:durasi,tanggal',
@@ -89,11 +88,11 @@ class PendaftaranMagangController extends Controller
             $cvPath = $request->file('cv')
                 ->store("berkas_pendaftaran/{$pendaftaran->id}/cv", 'public');
 
-            $spPath = $request->file('surat_pengantar')
-                ->store("berkas_pendaftaran/{$pendaftaran->id}/surat_pengantar", 'public');
+            // $spPath = $request->file('surat_pengantar')
+            //     ->store("berkas_pendaftaran/{$pendaftaran->id}/surat_pengantar", 'public');
 
-            $ktmPath = $request->file('ktm')
-                ->store("berkas_pendaftaran/{$pendaftaran->id}/ktm", 'public');
+            // $ktmPath = $request->file('ktm')
+            //     ->store("berkas_pendaftaran/{$pendaftaran->id}/ktm", 'public');
 
             // 5. Catat metadata file di tabel berkas_pendaftaran
             BerkasPendaftaran::create([
@@ -103,19 +102,19 @@ class PendaftaranMagangController extends Controller
                 'valid'          => 'pending',
             ]);
 
-            BerkasPendaftaran::create([
-                'pendaftaran_id' => $pendaftaran->id,
-                'jenis_berkas'   => 'surat_pengantar',
-                'path_file'      => $spPath,
-                'valid'          => 'pending',
-            ]);
+            // BerkasPendaftaran::create([
+            //     'pendaftaran_id' => $pendaftaran->id,
+            //     'jenis_berkas'   => 'surat_pengantar',
+            //     'path_file'      => $spPath,
+            //     'valid'          => 'pending',
+            // ]);
 
-            BerkasPendaftaran::create([
-                'pendaftaran_id' => $pendaftaran->id,
-                'jenis_berkas'   => 'ktm',
-                'path_file'      => $ktmPath,
-                'valid'          => 'pending',
-            ]);
+            // BerkasPendaftaran::create([
+            //     'pendaftaran_id' => $pendaftaran->id,
+            //     'jenis_berkas'   => 'ktm',
+            //     'path_file'      => $ktmPath,
+            //     'valid'          => 'pending',
+            // ]);
 
             DB::commit();
 

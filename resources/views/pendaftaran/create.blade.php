@@ -58,6 +58,15 @@
                                     required
                                 >
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Instansi/Agency <span class="text-red-500">*</span></label>
+                                <input
+                                    type="text"
+                                    name="agency"
+                                    class="w-full border rounded p-2 text-sm focus:ring-red-500 focus:border-red-500"
+                                    value="{{ old('agency') }}"
+                                    required
+                                >
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">NIM</label>
@@ -190,29 +199,6 @@
                                     required
                                 >
                                 <p class="text-xs text-gray-500 mt-1">Format: PDF, max 2MB</p>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Surat Pengantar Kampus (PDF) <span class="text-red-500">*</span></label>
-                                <input
-                                    type="file"
-                                    name="surat_pengantar"
-                                    accept="application/pdf"
-                                    class="w-full border rounded p-2 text-sm focus:ring-red-500 focus:border-red-500"
-                                    required
-                                >
-                                <p class="text-xs text-gray-500 mt-1">Ditandatangani dan distempel kampus</p>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Kartu Mahasiswa / KTM (PDF) <span class="text-red-500">*</span></label>
-                                <input
-                                    type="file"
-                                    name="ktm"
-                                    accept="application/pdf"
-                                    class="w-full border rounded p-2 text-sm focus:ring-red-500 focus:border-red-500"
-                                    required
-                                >
                             </div>
                         </div>
 

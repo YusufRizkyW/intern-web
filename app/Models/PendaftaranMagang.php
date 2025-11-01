@@ -12,6 +12,7 @@ class PendaftaranMagang extends Model
     protected $fillable = [
         'user_id',
         'nama_lengkap',
+        'agency',
         'nim',
         'email',
         'no_hp',
@@ -27,9 +28,14 @@ class PendaftaranMagang extends Model
         return $this->hasMany(BerkasPendaftaran::class, 'pendaftaran_id');
     }
 
+    // public function user()
+    // {
+    //     return $this->belongsTo(User::class);
+    // }
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     use HasFactory;

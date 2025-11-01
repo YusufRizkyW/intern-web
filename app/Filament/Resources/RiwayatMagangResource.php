@@ -16,9 +16,11 @@ class RiwayatMagangResource extends Resource
     protected static ?string $model = RiwayatMagang::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
-    protected static ?string $navigationLabel = 'Riwayat Magang';
+    protected static ?string $navigationLabel = 'Riwayat';
     protected static ?string $navigationGroup = 'Magang';
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 5;
+    
+
 
     public static function form(Form $form): Form
     {
@@ -32,6 +34,7 @@ class RiwayatMagangResource extends Resource
                             ->searchable()
                             ->preload()
                             ->reactive()
+                            ->disabled()
                             ->afterStateUpdated(function ($state, callable $set) {
                                 if ($state) {
                                     $user = User::find($state);
@@ -40,36 +43,37 @@ class RiwayatMagangResource extends Resource
                                         $set('email', $user->email);
                                     }
                                 }
-                            })
-                            ->columnSpanFull(),
+                            }),
 
                         Forms\Components\TextInput::make('nama_lengkap')
-                            ->required()
-                            ->maxLength(255),
+                            ->disabled(),
 
                         Forms\Components\TextInput::make('nim')
-                            ->maxLength(50),
+                            ->disabled(),
 
                         Forms\Components\TextInput::make('email')
-                            ->email()
-                            ->required(),
+                            ->disabled(),
+
+                        Forms\Components\TextInput::make('no_hp')
+                            ->label('No. HP / WA')
+                            ->disabled(),
+
                     ])->columns(2),
 
                 Forms\Components\Section::make('Detail Magang')
                     ->schema([
-                        Forms\Components\TextInput::make('instansi')
-                            ->default('BPS Gresik')
-                            ->maxLength(255),
-
-                        // Forms\Components\TextInput::make('posisi')
-                        //     ->label('Divisi / Penempatan')
-                        //     ->maxLength(255),
+                        Forms\Components\TextInput::make('agency')
+                            ->label('Instansi')
+                            ->disabled(),
 
                         Forms\Components\DatePicker::make('tanggal_mulai')
-                            ->label('Tanggal Mulai'),
+                            ->label('Tanggal Mulai')
+                            ->disabled(),
 
                         Forms\Components\DatePicker::make('tanggal_selesai')
-                            ->label('Tanggal Selesai'),
+                            ->label('Tanggal Selesai')
+                            ->disabled(),
+
                     ])->columns(2),
 
                 Forms\Components\Section::make('Catatan & Sertifikat')
@@ -92,13 +96,36 @@ class RiwayatMagangResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                ->rowIndex()        // otomatis 1,2,3...
+                ->label('No')
+                ->alignCenter()
+                ->sortable(false)
+                ->searchable(false),
+
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Akun')
+                    ->searchable()
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('nama_lengkap')
                     ->label('Nama')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('instansi')
+                Tables\Columns\TextColumn::make('agency')
                     ->label('Instansi')
+                    ->sortable(),
+                
+                Tables\Columns\TextColumn::make('status_verifikasi')
+                    ->label('Status')
+                    ->badge()
+                    ->colors([
+                        'aktif' => 'Aktif',
+                        'selesai' => 'Selesai',
+                        'batal' => 'Batal',
+                        'arsip' => 'Arsip',
+                    ])
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('tanggal_mulai')
@@ -109,16 +136,14 @@ class RiwayatMagangResource extends Resource
                     ->date()
                     ->label('Selesai'),
 
-                Tables\Columns\TextColumn::make('created_at')
-                    ->since()
-                    ->label('Diinput'),
+                // Tables\Columns\TextColumn::make('created_at')
+                //     ->since()
+                //     ->label('Diinput'),
             ])
-            ->filters([
-                //
-            ])
+            
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

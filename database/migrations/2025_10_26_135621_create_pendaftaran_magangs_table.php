@@ -15,14 +15,13 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id'); // kalau pendaftaran harus login
             $table->string('nama_lengkap');
+            $table->string('agency')->required();
             $table->string('nim')->nullable();
             $table->string('email');
             $table->string('no_hp')->nullable();
-
             // status proses pendaftaran
-            $table->enum('status_verifikasi', ['pending', 'revisi', 'diterima', 'ditolak', 'selesai', 'arsip', 'batal'])
+            $table->enum('status_verifikasi', ['pending', 'revisi', 'diterima', 'ditolak', 'aktif', 'selesai', 'arsip', 'batal'])
                 ->default('pending');
-
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

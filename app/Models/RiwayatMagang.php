@@ -12,10 +12,10 @@ class RiwayatMagang extends Model
     protected $fillable = [
         'user_id',
         'nama_lengkap',
+        'agency',
         'nim',
         'email',
-        'instansi',
-        // 'posisi',
+        'no_hp',
         'tanggal_mulai',
         'tanggal_selesai',
         'catatan_admin',

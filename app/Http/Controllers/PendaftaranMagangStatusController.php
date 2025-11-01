@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\PendaftaranMagang;
 use App\Models\BerkasPendaftaran;
+use App\Models\RiwayatMagang;
 
 class PendaftaranMagangStatusController extends Controller
 {
@@ -14,30 +15,53 @@ class PendaftaranMagangStatusController extends Controller
     {
         $userId = $request->user()->id;
 
-        // 1. cek dulu: sudah diarsipkan belum?
-        // $riwayat = \App\Models\RiwayatMagang::where('user_id', $userId)->latest()->first();
-
-        // if ($riwayat) {
-        //     // kalau sudah punya riwayat → langsung ke halaman riwayat
-        //     return redirect()->route('riwayat.user.index');
-        // }
-
         $pendaftaran = PendaftaranMagang::where('user_id', $userId)
             ->latest()
+            ->first();
+
+        // ambil riwayat terbaru (buat ditampilin di tampilan kosong kalau mau)
+        $riwayatTerbaru = RiwayatMagang::where('user_id', $userId)
+            ->orderByDesc('tanggal_selesai')
             ->first();
 
         if (!$pendaftaran) {
             return view('pendaftaran.status', [
                 'pendaftaran' => null,
                 'berkas' => [],
+                'riwayatTerbaru' => $riwayatTerbaru,
+            ]);
+        }
+        $statusAktif = ['pending', 'revisi', 'diterima', 'aktif'];
+
+
+
+        if (in_array($pendaftaran->status_verifikasi, $statusAktif, true)) {
+            $berkas = BerkasPendaftaran::where('pendaftaran_id', $pendaftaran->id)->get();
+
+            return view('pendaftaran.status', [
+                'pendaftaran' => $pendaftaran,
+                'berkas' => $berkas,
+                'riwayat_terbaru' => $riwayatTerbaru,
             ]);
         }
 
-        $berkas = BerkasPendaftaran::where('pendaftaran_id', $pendaftaran->id)->get();
+        // 3) STATUS FINAL → tampilkan halaman "belum daftar" lagi
+        // (biar user bisa daftar ulang)
+        $statusFinal = ['selesai', 'batal', 'arsip'];
 
+        if (in_array($pendaftaran->status_verifikasi, $statusFinal, true)) {
+            return view('pendaftaran.status', [
+                'pendaftaran' => null,
+                'berkas' => [],
+                'riwayat_terbaru' => $riwayatTerbaru,
+            ]);
+        }
+
+         // fallback
         return view('pendaftaran.status', [
-            'pendaftaran' => $pendaftaran,
-            'berkas' => $berkas,
+            'pendaftaran' => null,
+            'berkas' => [],
+            'riwayat_terbaru' => $riwayatTerbaru,
         ]);
     }
 
