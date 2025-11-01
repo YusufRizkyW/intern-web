@@ -11,20 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pendaftaran_magang', function (Blueprint $table) {
+        Schema::create('pendaftaran_magangs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id'); // kalau pendaftaran harus login
-            $table->string('nama_lengkap');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->string('nama_lengkap')->required();
             $table->string('agency')->required();
-            $table->string('nim')->nullable();
-            $table->string('email');
-            $table->string('no_hp')->nullable();
+            $table->string('nim')->required();
+            $table->string('email')->required();
+            $table->string('no_hp')->required();
+            $table->string('link_drive')->required();
+            $table->string('catatan_admin')->nullable();
             // status proses pendaftaran
             $table->enum('status_verifikasi', ['pending', 'revisi', 'diterima', 'ditolak', 'aktif', 'selesai', 'arsip', 'batal'])
                 ->default('pending');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            
         });
 
     }

@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use App\Models\RiwayatMagang;
 use Illuminate\Database\Eloquent\Builder;
 
+
 class PendaftaranMagangResource extends Resource
 {
     protected static ?string $model = PendaftaranMagang::class;
@@ -83,6 +84,29 @@ class PendaftaranMagangResource extends Resource
                         ->disabled(),
                 ])->columns(2),
 
+            Forms\Components\Section::make('Link Berkas')
+                ->schema([
+                    Forms\Components\TextInput::make('link_drive')
+                        ->label('Link Google Drive')
+                        ->disabled()
+                        ->suffixAction(
+                            Forms\Components\Actions\Action::make('openLink')
+                                ->icon('heroicon-o-link')
+                                ->url(fn ($record) => $record?->link_drive, shouldOpenInNewTab: true)
+                                ->tooltip('Buka Link Drive')
+                        ),
+                ])->columns(1),
+            
+            Forms\Components\Section::make('Catatan Admin')
+                ->schema([
+                    Forms\Components\Textarea::make('catatan_admin')
+                        ->label('Catatan Admin')
+                        ->rows(3)
+                        ->helperText('Catatan ini akan terlihat oleh user di halaman status.')
+                        ->columnSpanFull(),
+                ])->columns(1),
+
+
             // Bagian Status Verifikasi (admin bisa ubah ini!)
             Forms\Components\Section::make('Status Verifikasi')
                 ->schema([
@@ -147,36 +171,21 @@ class PendaftaranMagangResource extends Resource
                     ])
                     ->toggleable(),
 
-                // Tables\Columns\TextColumn::make('durasi_bulan')
-                //     ->label('Durasi (bulan)')
-                //     ->suffix(' bln')
-                //     ->toggleable(),
+                Tables\Columns\TextColumn::make('link_drive')
+                    ->label('Link Drive')
+                    ->url(fn ($record) => $record->link_drive, shouldOpenInNewTab: true)
+                    ->limit(30)
+                    ->tooltip(fn ($record) => $record->link_drive),
 
-                // Tables\Columns\TextColumn::make('tanggal_mulai')
-                //     ->label('Mulai')
-                //     ->date()
-                //     ->toggleable(),
-
-                // Tables\Columns\TextColumn::make('tanggal_selesai')
-                //     ->label('Selesai')
-                //     ->date()
-                //     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Daftar')
                     ->dateTime('d M Y H:i')
                     ->sortable(),
             ]);
+        }
+        
 
-
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            BerkasPendaftaranRelationManager::class,
-        ];
-    }
 
      public static function getEloquentQuery(): Builder
     {

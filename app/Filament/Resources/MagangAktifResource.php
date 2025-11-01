@@ -51,23 +51,38 @@ class MagangAktifResource extends Resource
 
                 ])->columns(2),
 
+            Forms\Components\Section::make('Link Berkas')
+                ->schema([
+                    Forms\Components\TextInput::make('link_drive')
+                        ->label('Link Google Drive')
+                        ->disabled()
+                        ->suffixAction(
+                            Forms\Components\Actions\Action::make('openLink')
+                                ->icon('heroicon-o-link')
+                                ->url(fn ($record) => $record?->link_drive, shouldOpenInNewTab: true)
+                                ->tooltip('Buka Link Drive')
+                        ),
+                ])->columns(1),
+
+            Forms\Components\Section::make('Catatan Admin')
+                ->schema([
+                    Forms\Components\Textarea::make('catatan_admin')
+                        ->label('Catatan Admin')
+                        ->rows(3)
+                        ->helperText('Catatan ini akan terlihat oleh user di halaman status.')
+                        ->columnSpanFull(),
+                ])->columns(1),
+
             Forms\Components\Section::make('Status Verifikasi')
                 ->schema([
                     Forms\Components\Select::make('status_verifikasi')
                         ->label('Update Status Verifikasi')
                         ->options([
                             'diterima' => 'Diterima',
-                            'aktif' => 'Aktif',
+                            'selesai' => 'Selesai',
                             'batal' => 'Batal',
                         ])
                         ->required(),
-                ]),
-
-            Forms\Components\Section::make('Catatan')
-                ->schema([
-                    Forms\Components\Textarea::make('keterangan')
-                        ->label('Catatan')
-                        ->rows(3),
                 ]),
         ]);
     }
@@ -116,13 +131,6 @@ class MagangAktifResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ]);
-    }
-
-        public static function getRelations(): array
-    {
-        return [
-            BerkasPendaftaranRelationManager::class,
-        ];
     }
 
     /**

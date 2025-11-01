@@ -21,75 +21,78 @@ class RiwayatMagangResource extends Resource
     protected static ?int $navigationSort = 5;
     
 
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): \Filament\Forms\Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Data Peserta')
-                    ->schema([
-                        Forms\Components\Select::make('user_id')
+        return $form->schema([
+            Forms\Components\Section::make('Akun pendaftar')
+                ->schema([
+                    Forms\Components\Select::make('user_id')
                             ->label('User')
                             ->relationship('user', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->reactive()
-                            ->disabled()
-                            ->afterStateUpdated(function ($state, callable $set) {
-                                if ($state) {
-                                    $user = User::find($state);
-                                    if ($user) {
-                                        $set('nama_lengkap', $user->name);
-                                        $set('email', $user->email);
-                                    }
-                                }
-                            }),
-
-                        Forms\Components\TextInput::make('nama_lengkap')
                             ->disabled(),
+                ]),
+            
+            Forms\Components\Section::make('Data Pendaftar')
+                ->schema([
+                    Forms\Components\TextInput::make('nama_lengkap')
+                        ->label('Nama')
+                        ->disabled(),
 
-                        Forms\Components\TextInput::make('nim')
-                            ->disabled(),
+                    Forms\Components\TextInput::make('agency')
+                        ->label('Instansi')
+                        ->disabled(),
 
-                        Forms\Components\TextInput::make('email')
-                            ->disabled(),
+                    Forms\Components\TextInput::make('nim')
+                        ->label('NIM')
+                        ->disabled(),
 
-                        Forms\Components\TextInput::make('no_hp')
-                            ->label('No. HP / WA')
-                            ->disabled(),
+                    Forms\Components\TextInput::make('email')
+                        ->label('Email')
+                        ->disabled(),
 
-                    ])->columns(2),
+                    Forms\Components\TextInput::make('no_hp')
+                        ->label('No. HP / WA')
+                        ->disabled(),
 
-                Forms\Components\Section::make('Detail Magang')
-                    ->schema([
-                        Forms\Components\TextInput::make('agency')
-                            ->label('Instansi')
-                            ->disabled(),
+                    Forms\Components\DatePicker::make('tanggal_mulai')
+                        ->disabled(),
 
-                        Forms\Components\DatePicker::make('tanggal_mulai')
-                            ->label('Tanggal Mulai')
-                            ->disabled(),
+                    Forms\Components\DatePicker::make('tanggal_selesai')
+                        ->disabled(),
+                        
+                ])->columns(2),
 
-                        Forms\Components\DatePicker::make('tanggal_selesai')
-                            ->label('Tanggal Selesai')
-                            ->disabled(),
+                Forms\Components\Section::make('Link Berkas')
+                ->schema([
+                    Forms\Components\TextInput::make('link_drive')
+                        ->label('Link Google Drive')
+                        ->disabled()
+                        ->suffixAction(
+                            Forms\Components\Actions\Action::make('openLink')
+                                ->icon('heroicon-o-link')
+                                ->url(fn ($record) => $record?->link_drive, shouldOpenInNewTab: true)
+                                ->tooltip('Buka Link Drive')
+                        ),
+                ])->columns(1),
 
-                    ])->columns(2),
+            Forms\Components\Section::make('Catatan & Sertifikat')
+                ->schema([
+                    Forms\Components\Textarea::make('catatan_admin')
+                        ->label('Catatan Admin')
+                        ->rows(3)
+                        ->helperText('Catatan ini akan terlihat oleh user')
+                        ->columnSpanFull(),
 
-                Forms\Components\Section::make('Catatan & Sertifikat')
-                    ->schema([
-                        Forms\Components\Textarea::make('catatan_admin')
-                            ->rows(3),
-
-                        Forms\Components\FileUpload::make('file_sertifikat')
-                            ->label('Sertifikat (PDF)')
-                            ->disk('public')
-                            ->directory('sertifikat_magang')
-                            ->acceptedFileTypes(['application/pdf'])
-                            ->downloadable()
-                            ->openable(),
-                    ]),
-            ]);
+                    Forms\Components\FileUpload::make('file_sertifikat')
+                        ->label('Sertifikat (PDF)')
+                        ->disk('public')
+                        ->directory('sertifikat_magang')
+                        ->acceptedFileTypes(['application/pdf'])
+                        ->downloadable()
+                        ->openable(),
+                ]),
+            
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -136,9 +139,6 @@ class RiwayatMagangResource extends Resource
                     ->date()
                     ->label('Selesai'),
 
-                // Tables\Columns\TextColumn::make('created_at')
-                //     ->since()
-                //     ->label('Diinput'),
             ])
             
             ->actions([

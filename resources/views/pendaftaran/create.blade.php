@@ -187,20 +187,17 @@
 
                         <hr class="my-6">
 
-                        {{-- ====== Upload berkas ====== --}}
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">CV (PDF) <span class="text-red-500">*</span></label>
-                                <input
-                                    type="file"
-                                    name="cv"
-                                    accept="application/pdf"
-                                    class="w-full border rounded p-2 text-sm focus:ring-red-500 focus:border-red-500"
-                                    required
-                                >
-                                <p class="text-xs text-gray-500 mt-1">Format: PDF, max 2MB</p>
-                            </div>
+                        {{-- Link Google Drive --}}
+                        <div>
+                            <label class="block text-sm font-medium">Link Folder Google Drive</label>
+                            <input type="url" name="link_drive" class="w-full border rounded p-2"
+                                value="{{ old('link_drive') }}" required>
+                            <p class="text-xs text-gray-500 mt-1">
+                                Masukkan link folder Google Drive yang berisi 3 berkas (CV, Surat Pengantar, dan KTM).
+                                Pastikan link dapat diakses publik (siapa pun dengan link bisa melihat).
+                            </p>
                         </div>
+
 
                         <div>
                             <button

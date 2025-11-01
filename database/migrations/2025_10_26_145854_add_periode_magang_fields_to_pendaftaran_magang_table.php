@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pendaftaran_magang', function (Blueprint $table) {
+        Schema::table('pendaftaran_magangs', function (Blueprint $table) {
             $table->enum('tipe_periode', ['durasi', 'tanggal'])->default('durasi');
             $table->integer('durasi_bulan')->nullable(); // contoh: 1, 2, 3
             $table->date('tanggal_mulai')->nullable();

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PendaftaranMagang extends Model
 {
-    protected $table = 'pendaftaran_magang';
+    protected $table = 'pendaftaran_magangs';
 
     protected $fillable = [
         'user_id',
@@ -16,22 +16,14 @@ class PendaftaranMagang extends Model
         'nim',
         'email',
         'no_hp',
+        'link_drive',
+        'catatan_admin',
         'status_verifikasi',
         'tipe_periode',
         'durasi_bulan',
         'tanggal_mulai',
         'tanggal_selesai',
     ];
-
-    public function berkas()
-    {
-        return $this->hasMany(BerkasPendaftaran::class, 'pendaftaran_id');
-    }
-
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
 
     public function user()
     {
