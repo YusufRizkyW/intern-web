@@ -3,12 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MagangAktifResource\Pages;
+use App\Filament\Resources\PendaftaranMagangResource\RelationManagers\MembersRelationManager;
 use App\Models\PendaftaranMagang;
-use App\Filament\Resources\PendaftaranMagangResource\RelationManagers\BerkasPendaftaranRelationManager;
 use Filament\Forms;
-use Filament\Resources\Resource;
+use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
 
 class MagangAktifResource extends Resource
@@ -20,67 +21,112 @@ class MagangAktifResource extends Resource
     protected static ?string $navigationGroup = 'Magang';
     protected static ?int $navigationSort = 4;
 
-    public static function form(\Filament\Forms\Form $form): \Filament\Forms\Form
+    public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Section::make('Akun pendaftar')
+            // 1. info akun
+            Forms\Components\Section::make('Akun Pengaju')
                 ->schema([
                     Forms\Components\Select::make('user_id')
-                        ->label('User')
+                        ->label('User (yang login)')
                         ->relationship('user', 'name')
-                        ->disabled(),
+                        ->disabled(), // ini memang gak boleh diubah dari admin
                 ]),
 
-            Forms\Components\Section::make('Data pendaftar')
+            // 2. data pendaftar (bisa individu / ketua tim)
+            Forms\Components\Section::make('Data Pendaftar')
                 ->schema([
                     Forms\Components\TextInput::make('nama_lengkap')
+                        ->label('Nama Lengkap / Ketua')
                         ->disabled(),
 
                     Forms\Components\TextInput::make('agency')
-                        ->label('Instansi')
+                        ->label('Instansi / Sekolah / Kampus')
+                        ->disabled(),
+
+                    Forms\Components\TextInput::make('nim')
+                        ->label('NIM / NIS')
                         ->disabled(),
 
                     Forms\Components\TextInput::make('email')
+                        ->label('Email')
+                        ->disabled(),
+
+                    Forms\Components\TextInput::make('no_hp')
+                        ->label('No HP / WA')
+                        ->disabled(),
+
+                    Forms\Components\TextInput::make('tipe_pendaftaran')
+                        ->label('Tipe Pendaftaran')
+                        ->formatStateUsing(fn ($state) => $state === 'tim' ? 'Tim / Rombongan' : 'Individu')
+                        ->disabled(),
+                ])
+                ->columns(2),
+
+            // 3. periode
+            Forms\Components\Section::make('Periode Magang')
+                ->schema([
+                    Forms\Components\Select::make('tipe_periode')
+                        ->label('Mode Periode')
+                        ->options([
+                            'durasi'  => 'Durasi (x bulan)',
+                            'tanggal' => 'Tanggal Mulai & Selesai',
+                        ])
+                        ->disabled(),
+
+                    Forms\Components\TextInput::make('durasi_bulan')
+                        ->label('Durasi (bulan)')
                         ->disabled(),
 
                     Forms\Components\DatePicker::make('tanggal_mulai')
+                        ->label('Tanggal Mulai')
                         ->disabled(),
 
                     Forms\Components\DatePicker::make('tanggal_selesai')
+                        ->label('Tanggal Selesai')
                         ->disabled(),
+                ])
+                ->columns(2),
 
-                ])->columns(2),
-
-            Forms\Components\Section::make('Link Berkas')
+                
+            // 4. link drive
+            Forms\Components\Section::make('Link Berkas (Google Drive)')
                 ->schema([
                     Forms\Components\TextInput::make('link_drive')
-                        ->label('Link Google Drive')
+                        ->label('Link Drive')
                         ->disabled()
                         ->suffixAction(
                             Forms\Components\Actions\Action::make('openLink')
                                 ->icon('heroicon-o-link')
                                 ->url(fn ($record) => $record?->link_drive, shouldOpenInNewTab: true)
-                                ->tooltip('Buka Link Drive')
+                                ->tooltip('Buka di tab baru')
                         ),
-                ])->columns(1),
+                ]),
 
+            // 5. catatan admin (boleh diubah)
             Forms\Components\Section::make('Catatan Admin')
                 ->schema([
                     Forms\Components\Textarea::make('catatan_admin')
-                        ->label('Catatan Admin')
+                        ->label('Catatan untuk peserta')
                         ->rows(3)
-                        ->helperText('Catatan ini akan terlihat oleh user di halaman status.')
-                        ->columnSpanFull(),
-                ])->columns(1),
+                        ->helperText('Catatan ini ditampilkan ke user di halaman status.'),
+                ]),
 
-            Forms\Components\Section::make('Status Verifikasi')
+            // 6. status verifikasi (ini yang paling penting)
+            Forms\Components\Section::make('Status')
                 ->schema([
                     Forms\Components\Select::make('status_verifikasi')
-                        ->label('Update Status Verifikasi')
+                        ->label('Status Verifikasi')
                         ->options([
+                            // 'pending'  => 'Pending / Menunggu',
+                            // 'revisi'   => 'Perlu Revisi',
                             'diterima' => 'Diterima',
-                            'selesai' => 'Selesai',
-                            'batal' => 'Batal',
+                            'ditolak'  => 'Ditolak',
+                            // nanti kalau mau lanjut pipeline bisa tambahin:
+                            'aktif'    => 'Aktif',
+                            'selesai'  => 'Selesai',
+                            'batal'    => 'Dibatalkan',
+                            // 'arsip'    => 'Diarsipkan',
                         ])
                         ->required(),
                 ]),
@@ -92,45 +138,86 @@ class MagangAktifResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('no')
-                    ->rowIndex()        // otomatis 1,2,3...
+                    ->rowIndex()
                     ->label('No')
-                    ->alignCenter()
-                    ->sortable(false)
-                    ->searchable(false),
+                    ->alignCenter(),
 
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('Akun')
-                    ->searchable()
-                    ->sortable(),
+                    ->label('Akun Pengaju')
+                    ->toggleable()
+                    ->searchable(),
 
-                Tables\Columns\TextColumn::make('nama_lengkap')
-                    ->searchable()
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('nama_lengkap')
+                //     ->label('Nama / Ketua')
+                //     ->searchable()
+                //     ->sortable(),
 
                 Tables\Columns\TextColumn::make('agency')
                     ->label('Instansi')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
+
+                Tables\Columns\BadgeColumn::make('tipe_pendaftaran')
+                    ->label('Tipe')
+                    ->formatStateUsing(fn ($state) => $state === 'tim' ? 'Tim' : 'Individu')
+                    ->colors([
+                        'primary' => 'individu',
+                        'info'    => 'tim',
+                    ]),
 
                 Tables\Columns\BadgeColumn::make('status_verifikasi')
+                    ->label('Status')
                     ->colors([
-                        'success' => 'aktif',
+                        'warning' => 'pending',
+                        'info'    => 'revisi',
+                        'success' => 'diterima',
+                        'danger'  => 'ditolak',
                     ])
-                    ->label('Status'),
+                    ->sortable(),
 
-                Tables\Columns\TextColumn::make('tanggal_mulai')
-                    ->date()
-                    ->label('Mulai'),
-                
-                Tables\Columns\TextColumn::make('tanggal_selesai')
-                    ->date()
-                    ->label('Selesai'),
+                Tables\Columns\TextColumn::make('link_drive')
+                    ->label('Drive')
+                    ->url(fn ($record) => $record->link_drive, shouldOpenInNewTab: true)
+                    ->limit(25)
+                    ->tooltip(fn ($record) => $record->link_drive),
 
-
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Diajukan')
+                    ->dateTime('d M Y H:i')
+                    ->sortable(),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('status_verifikasi')
+                    ->label('Status')
+                    ->options([
+                        'pending'  => 'Pending',
+                        'revisi'   => 'Revisi',
+                        'diterima' => 'Diterima',
+                        'ditolak'  => 'Ditolak',
+                    ]),
+                Tables\Filters\SelectFilter::make('tipe_pendaftaran')
+                    ->label('Tipe')
+                    ->options([
+                        'individu' => 'Individu',
+                        'tim'      => 'Tim',
+                    ]),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
+    }
+
+
+    public static function getRelations(): array
+    {
+        return [
+            MembersRelationManager::class,
+            // kalau nanti kamu bikin tabel berkas, tinggal tambah di sini
+            // BerkasPendaftaranRelationManager::class,
+        ];
     }
 
     /**

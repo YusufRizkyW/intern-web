@@ -16,6 +16,8 @@ class PendaftaranMagang extends Model
         'nim',
         'email',
         'no_hp',
+        'tipe_pendaftaran',
+        'jumlah_anggota',   
         'link_drive',
         'catatan_admin',
         'status_verifikasi',
@@ -29,6 +31,13 @@ class PendaftaranMagang extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    
+    public function members()
+    {
+        return $this->hasMany(\App\Models\PendaftaranMagangMember::class);
+    }
+    
+
 
     use HasFactory;
 }

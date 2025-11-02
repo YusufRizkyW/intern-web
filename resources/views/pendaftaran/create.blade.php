@@ -1,31 +1,30 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Pendaftaran') }}
+            {{ __('Pendaftaran Magang') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            {{-- Card info atas --}}
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 text-sm">
-                    {{ __("You're on pendaftaran page!") }}
-                    <br>
-                    <span class="text-gray-500">
-                        Silakan isi data diri dan unggah berkas persyaratan magang.
-                    </span>
+            {{-- info akun yg login --}}
+            <div class="bg-white shadow-sm sm:rounded-lg">
+                <div class="p-6 text-sm text-gray-700">
+                    Login sebagai:
+                    <span class="font-semibold">{{ auth()->user()->name }}</span>
+                    <span class="text-gray-500">({{ auth()->user()->email }})</span>
+                    <p class="text-xs text-gray-400 mt-1">
+                        Catatan: Anda boleh mendaftarkan diri sendiri atau orang lain dari akun ini.
+                    </p>
                 </div>
             </div>
 
-            {{-- Card form pendaftaran --}}
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            {{-- form --}}
+            <div class="bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
-                    <h1 class="text-lg font-semibold mb-4">Pendaftaran Magang</h1>
-
-                    {{-- tampilkan error validasi --}}
+                    {{-- error --}}
                     @if ($errors->any())
                         <div class="mb-4 p-3 bg-red-100 text-red-700 rounded">
                             <ul class="text-sm list-disc list-inside">
@@ -36,173 +35,206 @@
                         </div>
                     @endif
 
-                    {{-- tampilkan flash success --}}
+                    {{-- success --}}
                     @if (session('success'))
                         <div class="mb-4 p-3 bg-green-100 text-green-700 rounded text-sm">
                             {{ session('success') }}
                         </div>
                     @endif
 
-                    <form action="{{ route('pendaftaran.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    <form action="{{ route('pendaftaran.store') }}" method="POST" class="space-y-6">
                         @csrf
 
-                        {{-- ====== Data diri ====== --}}
-                        <div class="space-y-4">
+                        {{-- 1. Jenis pendaftaran --}}
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-gray-700">
+                                Jenis Pendaftaran
+                            </label>
+                            <select name="tipe_pendaftaran" id="tipe_pendaftaran"
+                                    class="w-full border rounded p-2 text-sm focus:ring-red-500 focus:border-red-500">
+                                <option value="">-- pilih --</option>
+                                <option value="individu" {{ old('tipe_pendaftaran','individu') === 'individu' ? 'selected' : '' }}>Individu (1 orang)</option>
+                                <option value="tim" {{ old('tipe_pendaftaran') === 'tim' ? 'selected' : '' }}>Tim / Rombongan</option>
+                            </select>
+                            <p class="text-xs text-gray-500">
+                                Pilih <b>Tim</b> kalau Anda mewakili sekolah dan ingin mendaftarkan beberapa siswa sekaligus.
+                            </p>
+                        </div>
+
+                        {{-- 2A. Data peserta (INDIVIDU) --}}
+                        <div id="form_individu" class="{{ old('tipe_pendaftaran','individu') === 'individu' ? '' : 'hidden' }} space-y-4 border rounded p-4 mt-2">
+                            <h3 class="text-sm font-semibold text-gray-700">Data Peserta</h3>
+
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Nama Lengkap <span class="text-red-500">*</span></label>
-                                <input
-                                    type="text"
-                                    name="nama_lengkap"
-                                    class="w-full border rounded p-2 text-sm focus:ring-red-500 focus:border-red-500"
-                                    value="{{ old('nama_lengkap', auth()->user()->name ?? '') }}"
-                                    required
-                                >
+                                <label class="block text-sm text-gray-700">Nama Lengkap Peserta <span class="text-red-500">*</span></label>
+                                <input type="text" name="nama_lengkap"
+                                    value="{{ old('nama_lengkap') }}"
+                                    class="w-full border rounded p-2 text-sm">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Instansi/Agency <span class="text-red-500">*</span></label>
-                                <input
-                                    type="text"
-                                    name="agency"
-                                    class="w-full border rounded p-2 text-sm focus:ring-red-500 focus:border-red-500"
+                                <label class="block text-sm text-gray-700">Asal / Instansi / Kampus <span class="text-red-500">*</span></label>
+                                <input type="text" name="agency"
                                     value="{{ old('agency') }}"
-                                    required
-                                >
-
+                                    class="w-full border rounded p-2 text-sm">
+                            </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">NIM</label>
-                                <input
-                                    type="text"
-                                    name="nim"
-                                    class="w-full border rounded p-2 text-sm focus:ring-red-500 focus:border-red-500"
+                                <label class="block text-sm text-gray-700">NIM / NIS <span class="text-red-500">*</span></label>
+                                <input type="text" name="nim"
                                     value="{{ old('nim') }}"
-                                >
+                                    class="w-full border rounded p-2 text-sm">
                             </div>
-
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    class="w-full border rounded p-2 text-sm focus:ring-red-500 focus:border-red-500"
-                                    value="{{ old('email', auth()->user()->email ?? '') }}"
-                                    required
-                                >
+                                <label class="block text-sm text-gray-700">Email <span class="text-red-500">*</span></label>
+                                <input type="email" name="email"
+                                    value="{{ old('email') }}"
+                                    class="w-full border rounded p-2 text-sm">
                             </div>
-
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">No. HP / WA</label>
-                                <input
-                                    type="text"
-                                    name="no_hp"
-                                    class="w-full border rounded p-2 text-sm focus:ring-red-500 focus:border-red-500"
+                                <label class="block text-sm text-gray-700">No HP <span class="text-red-500">*</span></label>
+                                <input type="text" name="no_hp"
                                     value="{{ old('no_hp') }}"
-                                >
+                                    class="w-full border rounded p-2 text-sm">
                             </div>
+                            
+                        </div>
+
+                        {{-- 2B. Data peserta (TIM) --}}
+                        <div id="form_tim" class="{{ old('tipe_pendaftaran') === 'tim' ? '' : 'hidden' }} space-y-4 border rounded p-4 bg-gray-50 mt-2">
+                            <h3 class="text-sm font-semibold text-gray-700">Daftar Peserta (Tim)</h3>
+
+                            {{-- agency untuk seluruh tim --}}
+                            <div>
+                                <label class="block text-sm text-gray-700">Asal / Instansi / Kampus <span class="text-red-500">*</span></label>
+                                <input type="text" name="agency"
+                                    value="{{ old('agency') }}"
+                                    class="w-full border rounded p-2 text-sm">
+                            </div>
+
+                            <p class="text-xs text-gray-500 mb-2">
+                                Peserta 1 akan dianggap ketua / kontak utama.
+                            </p>
+
+                            <div id="anggota_list">
+                                @if (old('anggota'))
+                                    @foreach (old('anggota') as $i => $row)
+                                        <div class="border rounded p-3 bg-white space-y-2 mb-2">
+                                            <div class="flex items-center justify-between">
+                                                <div class="text-xs font-semibold text-gray-600">
+                                                    Peserta {{ $i+1 }} {{ $i===0 ? '(Ketua)' : '' }}
+                                                </div>
+                                                @if ($i !== 0)
+                                                    <button type="button" class="text-[11px] text-red-500 remove-anggota">Hapus</button>
+                                                @endif
+                                            </div>
+                                            <input type="text" name="anggota[{{ $i }}][nama]" placeholder="Nama Lengkap"
+                                                   value="{{ $row['nama'] ?? '' }}"
+                                                   class="w-full border rounded p-2 text-sm" {{ $i===0 ? 'required' : '' }}>
+                                            <input type="text" name="anggota[{{ $i }}][nim]" placeholder="NIM / NIS"
+                                                   value="{{ $row['nim'] ?? '' }}"
+                                                   class="w-full border rounded p-2 text-sm">
+                                            {{-- <input type="text" name="anggota[{{ $i }}][agency]" placeholder="Asal / Instansi / Kampus"
+                                                   value="{{ $row['agency'] ?? '' }}"
+                                                   class="w-full border rounded p-2 text-sm"> --}}
+                                            <input type="email" name="anggota[{{ $i }}][email]" placeholder="Email"
+                                                   value="{{ $row['email'] ?? '' }}"
+                                                   class="w-full border rounded p-2 text-sm">
+                                            <input type="text" name="anggota[{{ $i }}][no_hp]" placeholder="No HP"
+                                                   value="{{ $row['no_hp'] ?? '' }}"
+                                                   class="w-full border rounded p-2 text-sm">
+                                        </div>
+                                    @endforeach
+                                @else
+                                    {{-- default 1 peserta --}}
+                                    <div class="border rounded p-3 bg-white space-y-2 mb-2">
+                                        <div class="text-xs font-semibold text-gray-600">Peserta 1 (Ketua)</div>
+                                        <input type="text" name="anggota[0][nama]" placeholder="Nama Lengkap"
+                                               class="w-full border rounded p-2 text-sm">
+                                        {{-- <input type="text" name="anggota[0][agency]" placeholder="Asal / Instansi / Kampus"
+                                               class="w-full border rounded p-2 text-sm"> --}}
+                                        <input type="text" name="anggota[0][nim]" placeholder="NIM / NIS"
+                                               class="w-full border rounded p-2 text-sm">
+                                        <input type="email" name="anggota[0][email]" placeholder="Email"
+                                               class="w-full border rounded p-2 text-sm">
+                                        <input type="text" name="anggota[0][no_hp]" placeholder="No HP"
+                                               class="w-full border rounded p-2 text-sm">
+                                    </div>
+                                @endif
+                            </div>
+
+                            <button type="button" id="add_member" class="text-red-600 text-xs underline">
+                                + Tambah Peserta
+                            </button>
                         </div>
 
                         <hr class="my-6">
 
-                        {{-- ====== Periode Magang ====== --}}
+                        {{-- 3. Periode --}}
                         <div class="space-y-4">
                             <label class="block text-sm font-semibold text-gray-700">Periode Magang</label>
 
                             <div class="space-y-6 border rounded p-4">
+                                <label class="flex items-start gap-2">
+                                    <input type="radio" name="tipe_periode" value="durasi"
+                                           class="mt-1" {{ old('tipe_periode','durasi') === 'durasi' ? 'checked' : '' }}>
+                                    <span>
+                                        <span class="text-sm font-medium">Pakai durasi</span>
+                                        <span class="block text-xs text-gray-500">1–6 bulan</span>
+                                    </span>
+                                </label>
 
-                                {{-- Opsi durasi bulan --}}
-                                <div class="space-y-3">
-                                    <label class="flex items-start gap-2 cursor-pointer">
-                                        <input
-                                            type="radio"
-                                            name="tipe_periode"
-                                            value="durasi"
-                                            class="mt-1 text-red-600 border-gray-300 focus:ring-red-500"
-                                            {{ old('tipe_periode', 'durasi') === 'durasi' ? 'checked' : '' }}
-                                        >
-                                        <span>
-                                            <span class="font-medium text-sm text-gray-800">Pilih durasi magang</span>
-                                            <span class="block text-xs text-gray-500">Contoh: 1 bulan, 2 bulan, 3 bulan...</span>
-                                        </span>
-                                    </label>
-
-                                    <div class="ml-6">
-                                        <label class="block text-xs text-gray-700 mb-1">Durasi (bulan)</label>
-                                        <select
-                                            name="durasi_bulan"
-                                            class="border rounded p-2 w-40 text-sm focus:ring-red-500 focus:border-red-500"
-                                        >
-                                            <option value="">-- pilih --</option>
-                                            <option value="1" {{ old('durasi_bulan') == 1 ? 'selected' : '' }}>1 bulan</option>
-                                            <option value="2" {{ old('durasi_bulan') == 2 ? 'selected' : '' }}>2 bulan</option>
-                                            <option value="3" {{ old('durasi_bulan') == 3 ? 'selected' : '' }}>3 bulan</option>
-                                            <option value="4" {{ old('durasi_bulan') == 4 ? 'selected' : '' }}>4 bulan</option>
-                                            <option value="5" {{ old('durasi_bulan') == 5 ? 'selected' : '' }}>5 bulan</option>
-                                            <option value="6" {{ old('durasi_bulan') == 6 ? 'selected' : '' }}>6 bulan</option>
-                                        </select>
-                                    </div>
+                                <div id="durasi-wrapper" @if(old('tipe_periode')==='tanggal') style="display:none" @endif class="ml-6">
+                                    <select name="durasi_bulan" class="border rounded p-2 text-sm w-40">
+                                        <option value="">-- pilih --</option>
+                                        @for ($i=1; $i<=6; $i++)
+                                            <option value="{{ $i }}" {{ old('durasi_bulan')==$i ? 'selected' : '' }}>{{ $i }} bulan</option>
+                                        @endfor
+                                    </select>
                                 </div>
 
                                 <div class="border-t pt-4"></div>
 
-                                {{-- Opsi tanggal custom --}}
-                                <div class="space-y-3">
-                                    <label class="flex items-start gap-2 cursor-pointer">
-                                        <input
-                                            type="radio"
-                                            name="tipe_periode"
-                                            value="tanggal"
-                                            class="mt-1 text-red-600 border-gray-300 focus:ring-red-500"
-                                            {{ old('tipe_periode') === 'tanggal' ? 'checked' : '' }}
-                                        >
-                                        <span>
-                                            <span class="font-medium text-sm text-gray-800">Pilih tanggal mulai & selesai</span>
-                                            <span class="block text-xs text-gray-500">Contoh: 2025-07-01 sampai 2025-09-30</span>
-                                        </span>
-                                    </label>
+                                <label class="flex items-start gap-2">
+                                    <input type="radio" name="tipe_periode" value="tanggal"
+                                           class="mt-1" {{ old('tipe_periode') === 'tanggal' ? 'checked' : '' }}>
+                                    <span>
+                                        <span class="text-sm font-medium">Pakai tanggal mulai & selesai</span>
+                                    </span>
+                                </label>
 
-                                    <div class="ml-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-xs text-gray-700 mb-1">Tanggal Mulai</label>
-                                            <input
-                                                type="date"
-                                                name="tanggal_mulai"
-                                                class="border rounded p-2 w-full text-sm focus:ring-red-500 focus:border-red-500"
-                                                value="{{ old('tanggal_mulai') }}"
-                                            >
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-xs text-gray-700 mb-1">Tanggal Selesai</label>
-                                            <input
-                                                type="date"
-                                                name="tanggal_selesai"
-                                                class="border rounded p-2 w-full text-sm focus:ring-red-500 focus:border-red-500"
-                                                value="{{ old('tanggal_selesai') }}"
-                                            >
-                                        </div>
+                                <div id="tanggal-wrapper" @if(old('tipe_periode','durasi')==='durasi') style="display:none" @endif
+                                     class="ml-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs text-gray-700 mb-1">Tanggal Mulai</label>
+                                        <input type="date" name="tanggal_mulai"
+                                               value="{{ old('tanggal_mulai') }}"
+                                               class="border rounded p-2 text-sm w-full">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-gray-700 mb-1">Tanggal Selesai</label>
+                                        <input type="date" name="tanggal_selesai"
+                                               value="{{ old('tanggal_selesai') }}"
+                                               class="border rounded p-2 text-sm w-full">
                                     </div>
                                 </div>
-
                             </div>
                         </div>
 
                         <hr class="my-6">
 
-                        {{-- Link Google Drive --}}
+                        {{-- 4. Link drive --}}
                         <div>
                             <label class="block text-sm font-medium">Link Folder Google Drive</label>
-                            <input type="url" name="link_drive" class="w-full border rounded p-2"
-                                value="{{ old('link_drive') }}" required>
+                            <input type="url" name="link_drive" value="{{ old('link_drive') }}"
+                                   class="w-full border rounded p-2 text-sm" required>
                             <p class="text-xs text-gray-500 mt-1">
-                                Masukkan link folder Google Drive yang berisi 3 berkas (CV, Surat Pengantar, dan KTM).
-                                Pastikan link dapat diakses publik (siapa pun dengan link bisa melihat).
+                                Satu link bisa berisi semua dokumen peserta yang Anda daftarkan ini.
                             </p>
                         </div>
 
-
+                        {{-- submit --}}
                         <div>
-                            <button
-                                type="submit"
-                                class="w-full bg-red-600 text-white p-2 rounded font-semibold text-sm hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                            <button type="submit"
+                                    class="w-full bg-red-600 text-white p-2 rounded text-sm font-semibold hover:bg-red-700">
                                 Kirim Pendaftaran
                             </button>
                         </div>
@@ -213,4 +245,93 @@
 
         </div>
     </div>
+
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tipe = document.getElementById('tipe_pendaftaran');
+            const formIndividu = document.getElementById('form_individu');
+            const formTim = document.getElementById('form_tim');
+            const anggotaList = document.getElementById('anggota_list');
+            const addBtn = document.getElementById('add_member');
+
+            const radioDurasi = document.querySelector('input[name="tipe_periode"][value="durasi"]');
+            const radioTanggal = document.querySelector('input[name="tipe_periode"][value="tanggal"]');
+            const durasiWrap = document.getElementById('durasi-wrapper');
+            const tanggalWrap = document.getElementById('tanggal-wrapper');
+
+            // helper: enable / disable semua input di dalam 1 blok
+            function setDisabled(container, disabled) {
+                container.querySelectorAll('input, select, textarea').forEach(el => {
+                    el.disabled = disabled;
+                });
+            }
+
+            function toggleTipe() {
+                if (tipe.value === 'tim') {
+                    // show tim
+                    formTim.classList.remove('hidden');
+                    setDisabled(formTim, false);
+
+                    // hide individu
+                    formIndividu.classList.add('hidden');
+                    setDisabled(formIndividu, true);
+                } else {
+                    // show individu
+                    formIndividu.classList.remove('hidden');
+                    setDisabled(formIndividu, false);
+
+                    // hide tim
+                    formTim.classList.add('hidden');
+                    setDisabled(formTim, true);
+                }
+            }
+
+            tipe.addEventListener('change', toggleTipe);
+            toggleTipe(); // panggil sekali waktu load
+
+            // tambah anggota dinamis
+            let count = {{ old('anggota') ? count(old('anggota')) : 1 }};
+            addBtn?.addEventListener('click', () => {
+                anggotaList.insertAdjacentHTML('beforeend', `
+                    <div class="border rounded p-3 bg-white space-y-2 mb-2">
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs font-semibold text-gray-600">Peserta ${count+1}</div>
+                            <button type="button" class="text-[11px] text-red-500 remove-anggota">Hapus</button>
+                        </div>
+                        <input type="text" name="anggota[${count}][nama]" placeholder="Nama Lengkap"
+                               class="w-full border rounded p-2 text-sm" required>
+                       
+                        <input type="text" name="anggota[${count}][nim]" placeholder="NIM / NIS"
+                               class="w-full border rounded p-2 text-sm">
+                        <input type="email" name="anggota[${count}][email]" placeholder="Email"
+                               class="w-full border rounded p-2 text-sm">
+                        <input type="text" name="anggota[${count}][no_hp]" placeholder="No HP"
+                               class="w-full border rounded p-2 text-sm">
+                    </div>
+                `);
+                count++;
+            });
+
+            // hapus anggota
+            anggotaList?.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-anggota')) {
+                    e.target.closest('div.border').remove();
+                }
+            });
+
+            // periode
+            radioDurasi?.addEventListener('change', () => {
+                durasiWrap.style.display = '';
+                tanggalWrap.style.display = 'none';
+            });
+            radioTanggal?.addEventListener('change', () => {
+                durasiWrap.style.display = 'none';
+                tanggalWrap.style.display = '';
+            });
+        });
+    </script> --}}
+    <script>
+        const initialCount = {{ old('anggota') ? count(old('anggota')) : 1 }};
+    </script>
+    @vite('resources/js/pendaftaran.js')
 </x-app-layout>

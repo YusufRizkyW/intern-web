@@ -17,6 +17,10 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('nama_lengkap')->required();
             $table->string('agency')->required();
+            $table->enum('tipe_pendaftaran', ['individu', 'tim'])
+                ->default('individu');
+            $table->unsignedInteger('jumlah_anggota')
+                ->nullable();
             $table->string('nim')->required();
             $table->string('email')->required();
             $table->string('no_hp')->required();

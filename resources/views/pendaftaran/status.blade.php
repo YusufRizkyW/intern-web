@@ -19,13 +19,10 @@
                     @endif
 
                     @php
-                        // supaya gampang: status yang dianggap "aktif" / pendaftaran sedang berjalan
-                        $statusAktif = ['pending', 'revisi', 'diterima', 'aktif'];
-                        // status akhir => tampilan dikosongkan lagi
                         $statusFinal = ['selesai', 'batal', 'arsip'];
                     @endphp
 
-                    {{-- KALAU TIDAK ADA PENDAFTARAN / SUDAH FINAL --}}
+                    {{-- KALAU BELUM / SUDAH FINAL --}}
                     @if (!$pendaftaran || in_array($pendaftaran->status_verifikasi, $statusFinal, true))
                         <div class="text-center space-y-4 py-8">
                             <div class="text-lg font-semibold text-gray-800">
@@ -40,11 +37,10 @@
                                 Ajukan Pendaftaran
                             </a>
 
-                            {{-- kalau mau, tampilkan riwayat terakhir --}}
                             @isset($riwayat_terbaru)
                                 <div class="mt-6 p-3 bg-gray-50 rounded text-xs text-gray-600">
                                     Magang terakhir kamu:
-                                    <strong>{{ $riwayat_terbaru->instansi ?? 'Instansi' }}</strong>
+                                    <strong>{{ $riwayat_terbaru->instansi_asal ?? $riwayat_terbaru->agency ?? 'Instansi' }}</strong>
                                     @if ($riwayat_terbaru->tanggal_mulai && $riwayat_terbaru->tanggal_selesai)
                                         ({{ \Carbon\Carbon::parse($riwayat_terbaru->tanggal_mulai)->format('d M Y') }}
                                         –
@@ -57,11 +53,8 @@
                                 </div>
                             @endisset
                         </div>
-
-
-                    {{-- KALAU ADA PENDAFTARAN AKTIF --}}
                     @else
-                        {{-- Bagian ringkasan status --}}
+                        {{-- ADA PENDAFTARAN AKTIF --}}
                         <div class="mb-6">
                             <h1 class="text-lg font-semibold text-gray-800 mb-2">
                                 Halo, {{ $pendaftaran->nama_lengkap }}
@@ -71,21 +64,17 @@
                             </p>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {{-- Status verifikasi --}}
+                                {{-- Status --}}
                                 <div class="border rounded p-4 bg-gray-50">
                                     <div class="text-xs text-gray-500 mb-1">Status Verifikasi</div>
                                     @php
                                         $status = $pendaftaran->status_verifikasi;
-
                                         $statusLabel = [
                                             'pending'  => 'Menunggu Review',
                                             'revisi'   => 'Perlu Revisi',
                                             'diterima' => 'Diterima',
                                             'aktif'    => 'Aktif (Sedang Magang)',
                                             'ditolak'  => 'Ditolak',
-                                            'selesai'  => 'Selesai',
-                                            'batal'    => 'Dibatalkan',
-                                            'arsip'    => 'Diarsipkan',
                                         ][$status] ?? $status;
 
                                         $statusColor = match ($status) {
@@ -129,28 +118,23 @@
                             <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
                                 Data Pendaftar
                             </h2>
-
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                 <div class="border rounded p-4">
                                     <div class="text-gray-500 text-xs">Nama Lengkap</div>
                                     <div class="font-medium text-gray-800">{{ $pendaftaran->nama_lengkap }}</div>
                                 </div>
-
                                 <div class="border rounded p-4">
                                     <div class="text-gray-500 text-xs">NIM</div>
                                     <div class="font-medium text-gray-800">{{ $pendaftaran->nim ?: '-' }}</div>
                                 </div>
-
                                 <div class="border rounded p-4">
                                     <div class="text-gray-500 text-xs">Email</div>
                                     <div class="font-medium text-gray-800">{{ $pendaftaran->email }}</div>
                                 </div>
-
                                 <div class="border rounded p-4">
                                     <div class="text-gray-500 text-xs">No. HP / WA</div>
                                     <div class="font-medium text-gray-800">{{ $pendaftaran->no_hp ?: '-' }}</div>
                                 </div>
-
                                 <div class="border rounded p-4">
                                     <div class="text-gray-500 text-xs">Instansi / Agency Asal</div>
                                     <div class="font-medium text-gray-800">{{ $pendaftaran->agency ?? '-' }}</div>
@@ -158,12 +142,34 @@
                             </div>
                         </div>
 
+                        {{-- kalau pendaftarannya TIM --}}
+                        @if ($pendaftaran->tipe_pendaftaran === 'tim')
+                            <div class="mb-6">
+                                <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
+                                    Anggota Tim
+                                </h2>
+                                @if ($pendaftaran->members && $pendaftaran->members->count())
+                                    <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
+                                        @foreach ($pendaftaran->members as $member)
+                                            <li>
+                                                {{ $member->nama_anggota }}
+                                                @if ($member->nim_anggota)
+                                                    ({{ $member->nim_anggota }})
+                                                @endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <p class="text-xs text-gray-400">Tidak ada anggota tambahan yang diinput.</p>
+                                @endif
+                            </div>
+                        @endif
+
                         {{-- Link Drive --}}
                         <div class="mb-6">
                             <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
                                 Dokumen Persyaratan
                             </h2>
-
                             <p class="text-xs text-gray-500 mb-2">
                                 Dokumen Anda disimpan di Google Drive. Admin akan memeriksa dokumen dari link berikut.
                             </p>
@@ -184,8 +190,7 @@
 
                             @if ($pendaftaran->status_verifikasi === 'revisi')
                                 <div class="mt-3 p-3 bg-blue-50 text-blue-700 text-xs rounded">
-                                    Dokumen Anda perlu diperbaiki. Silakan perbarui berkas di folder Google Drive yang sudah Anda kirim,
-                                    lalu hubungi admin jika diperlukan.
+                                    Dokumen Anda perlu diperbaiki. Silakan perbarui berkas di folder Google Drive yang sudah Anda kirim.
                                 </div>
                             @endif
                         </div>
@@ -200,25 +205,21 @@
                             </div>
                         @endif
 
-                        {{-- Info status tambahan --}}
-                        @if ($pendaftaran->status_verifikasi === 'pending')
-                            <p class="text-xs text-gray-500">
-                                Pendaftaran Anda sedang menunggu verifikasi admin.
-                            </p>
-                        @elseif ($pendaftaran->status_verifikasi === 'diterima')
-                            <p class="text-xs text-green-600">
-                                Pendaftaran Anda sudah diterima. Silakan menunggu jadwal mulai / informasi selanjutnya.
-                            </p>
-                        @elseif ($pendaftaran->status_verifikasi === 'aktif')
-                            <p class="text-xs text-green-600">
-                                Anda sedang menjalani periode magang. Pastikan link Drive tetap bisa diakses.
-                            </p>
-                        @elseif ($pendaftaran->status_verifikasi === 'ditolak')
-                            <p class="text-xs text-red-500">
-                                Pendaftaran Anda ditolak. Silakan hubungi admin jika ingin mengajukan kembali.
-                            </p>
-                        @endif
-
+                        {{-- Info status bawah --}}
+                        @switch($pendaftaran->status_verifikasi)
+                            @case('pending')
+                                <p class="text-xs text-gray-500">Pendaftaran Anda sedang menunggu verifikasi admin.</p>
+                                @break
+                            @case('diterima')
+                                <p class="text-xs text-green-600">Pendaftaran Anda sudah diterima. Silakan menunggu info selanjutnya.</p>
+                                @break
+                            @case('aktif')
+                                <p class="text-xs text-green-600">Anda sedang menjalani periode magang. Pastikan link Drive tetap bisa diakses.</p>
+                                @break
+                            @case('ditolak')
+                                <p class="text-xs text-red-500">Pendaftaran Anda ditolak. Silakan hubungi admin jika ingin mengajukan ulang.</p>
+                                @break
+                        @endswitch
                     @endif
                 </div>
             </div>
