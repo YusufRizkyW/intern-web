@@ -105,10 +105,9 @@
                 {{ __('Status Pendaftaran') }}
             </x-responsive-nav-link>
 
-            <x-nav-link :href="route('riwayat.user.index')" :active="request()->routeIs('riwayat.user.index')">
+            <x-responsive-nav-link :href="route('riwayat.user.index')" :active="request()->routeIs('riwayat.user.index')">
                 {{ __('Riwayat Magang') }}
-            </x-nav-link>
-
+            </x-responsive-nav-link>
 
             
         </div>

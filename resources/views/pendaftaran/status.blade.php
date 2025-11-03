@@ -22,7 +22,7 @@
                         $statusFinal = ['selesai', 'batal', 'arsip'];
                     @endphp
 
-                    {{-- KALAU BELUM / SUDAH FINAL --}}
+                    {{-- TIDAK ADA PENDAFTARAN AKTIF / SUDAH FINAL --}}
                     @if (!$pendaftaran || in_array($pendaftaran->status_verifikasi, $statusFinal, true))
                         <div class="text-center space-y-4 py-8">
                             <div class="text-lg font-semibold text-gray-800">
@@ -40,7 +40,7 @@
                             @isset($riwayat_terbaru)
                                 <div class="mt-6 p-3 bg-gray-50 rounded text-xs text-gray-600">
                                     Magang terakhir kamu:
-                                    <strong>{{ $riwayat_terbaru->instansi_asal ?? $riwayat_terbaru->agency ?? 'Instansi' }}</strong>
+                                    <strong>{{ $riwayat_terbaru->agency ?? 'Instansi' }}</strong>
                                     @if ($riwayat_terbaru->tanggal_mulai && $riwayat_terbaru->tanggal_selesai)
                                         ({{ \Carbon\Carbon::parse($riwayat_terbaru->tanggal_mulai)->format('d M Y') }}
                                         –
@@ -53,28 +53,50 @@
                                 </div>
                             @endisset
                         </div>
+
+                    {{-- ADA PENDAFTARAN AKTIF --}}
                     @else
-                        {{-- ADA PENDAFTARAN AKTIF --}}
+                        {{-- Ringkasan status --}}
                         <div class="mb-6">
-                            <h1 class="text-lg font-semibold text-gray-800 mb-2">
+                            <h1 class="text-lg font-semibold text-gray-800 mb-1">
                                 Halo, {{ $pendaftaran->nama_lengkap }}
                             </h1>
-                            <p class="text-sm text-gray-600 mb-4">
+
+                            <p class="text-sm text-gray-600 mb-2">
                                 Berikut status pendaftaran magang Anda.
                             </p>
 
+                            <div class="mb-4">
+                                <span class="inline-flex items-center gap-2 text-xs">
+                                    <span class="font-semibold text-gray-600">Jenis pendaftaran:</span>
+                                    @if ($pendaftaran->tipe_pendaftaran === 'tim')
+                                        <span class="px-2 py-1 rounded bg-blue-100 text-blue-800 font-semibold">
+                                            Tim / Rombongan
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-1 rounded bg-gray-100 text-gray-800 font-semibold">
+                                            Individu
+                                        </span>
+                                    @endif
+                                </span>
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {{-- Status --}}
+                                {{-- Status verifikasi --}}
                                 <div class="border rounded p-4 bg-gray-50">
                                     <div class="text-xs text-gray-500 mb-1">Status Verifikasi</div>
                                     @php
                                         $status = $pendaftaran->status_verifikasi;
+
                                         $statusLabel = [
                                             'pending'  => 'Menunggu Review',
                                             'revisi'   => 'Perlu Revisi',
                                             'diterima' => 'Diterima',
                                             'aktif'    => 'Aktif (Sedang Magang)',
                                             'ditolak'  => 'Ditolak',
+                                            'selesai'  => 'Selesai',
+                                            'batal'    => 'Dibatalkan',
+                                            'arsip'    => 'Diarsipkan',
                                         ][$status] ?? $status;
 
                                         $statusColor = match ($status) {
@@ -113,54 +135,99 @@
                             </div>
                         </div>
 
-                        {{-- Data pendaftar --}}
+                        {{-- Data pendaftar utama (individu atau ketua tim) --}}
                         <div class="mb-6">
                             <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
-                                Data Pendaftar
+                                Data Peserta Utama
+                                @if ($pendaftaran->tipe_pendaftaran === 'tim')
+                                    <span class="text-[11px] text-gray-400 normal-case">(Ketua tim)</span>
+                                @endif
                             </h2>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                 <div class="border rounded p-4">
                                     <div class="text-gray-500 text-xs">Nama Lengkap</div>
                                     <div class="font-medium text-gray-800">{{ $pendaftaran->nama_lengkap }}</div>
                                 </div>
+
                                 <div class="border rounded p-4">
-                                    <div class="text-gray-500 text-xs">NIM</div>
+                                    <div class="text-gray-500 text-xs">NIM / NIS</div>
                                     <div class="font-medium text-gray-800">{{ $pendaftaran->nim ?: '-' }}</div>
                                 </div>
+
                                 <div class="border rounded p-4">
                                     <div class="text-gray-500 text-xs">Email</div>
-                                    <div class="font-medium text-gray-800">{{ $pendaftaran->email }}</div>
+                                    <div class="font-medium text-gray-800">{{ $pendaftaran->email ?: '-' }}</div>
                                 </div>
+
                                 <div class="border rounded p-4">
                                     <div class="text-gray-500 text-xs">No. HP / WA</div>
                                     <div class="font-medium text-gray-800">{{ $pendaftaran->no_hp ?: '-' }}</div>
                                 </div>
-                                <div class="border rounded p-4">
-                                    <div class="text-gray-500 text-xs">Instansi / Agency Asal</div>
+
+                                <div class="border rounded p-4 md:col-span-2">
+                                    <div class="text-gray-500 text-xs">Instansi / Asal</div>
                                     <div class="font-medium text-gray-800">{{ $pendaftaran->agency ?? '-' }}</div>
                                 </div>
                             </div>
                         </div>
 
-                        {{-- kalau pendaftarannya TIM --}}
+                        {{-- Anggota tim (kalau tipe tim) --}}
                         @if ($pendaftaran->tipe_pendaftaran === 'tim')
                             <div class="mb-6">
                                 <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
                                     Anggota Tim
                                 </h2>
-                                @if ($pendaftaran->members && $pendaftaran->members->count())
-                                    <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
-                                        @foreach ($pendaftaran->members as $member)
-                                            <li>
-                                                {{ $member->nama_anggota }}
-                                                @if ($member->nim_anggota)
-                                                    ({{ $member->nim_anggota }})
-                                                @endif
-                                            </li>
-                                        @endforeach
-                                    </ul>
+
+                                @php
+                                    $members = $pendaftaran->members ?? collect();
+                                @endphp
+
+                                @if ($members->isEmpty())
+                                    <p class="text-xs text-gray-400">
+                                        Tidak ada anggota tambahan yang diinput.
+                                    </p>
                                 @else
-                                    <p class="text-xs text-gray-400">Tidak ada anggota tambahan yang diinput.</p>
+                                    <div class="overflow-x-auto border rounded">
+                                        <table class="min-w-full text-sm">
+                                            <thead class="bg-gray-100 text-xs text-gray-500 uppercase">
+                                                <tr>
+                                                    <th class="px-4 py-2 text-left">Nama</th>
+                                                    <th class="px-4 py-2 text-left">NIM / NIS</th>
+                                                    <th class="px-4 py-2 text-left">Email</th>
+                                                    <th class="px-4 py-2 text-left">No HP</th>
+                                                    <th class="px-4 py-2 text-left">Peran</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y">
+                                                @foreach ($members as $member)
+                                                    <tr>
+                                                        <td class="px-4 py-2">
+                                                            {{ $member->nama_anggota }}
+                                                        </td>
+                                                        <td class="px-4 py-2 text-gray-700">
+                                                            {{ $member->nim_anggota ?: '-' }}
+                                                        </td>
+                                                        <td class="px-4 py-2 text-gray-700">
+                                                            {{ $member->email_anggota ?: '-' }}
+                                                        </td>
+                                                        <td class="px-4 py-2 text-gray-700">
+                                                            {{ $member->no_hp_anggota ?: '-' }}
+                                                        </td>
+                                                        <td class="px-4 py-2 text-xs">
+                                                            @if ($member->is_ketua)
+                                                                <span class="inline-block px-2 py-1 rounded bg-blue-100 text-blue-800 font-semibold">
+                                                                    Ketua
+                                                                </span>
+                                                            @else
+                                                                <span class="text-gray-500">Anggota</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 @endif
                             </div>
                         @endif
@@ -170,8 +237,9 @@
                             <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
                                 Dokumen Persyaratan
                             </h2>
+
                             <p class="text-xs text-gray-500 mb-2">
-                                Dokumen Anda disimpan di Google Drive. Admin akan memeriksa dokumen dari link berikut.
+                                Dokumen disimpan di Google Drive. Admin akan memeriksa dokumen dari link berikut.
                             </p>
 
                             @if ($pendaftaran->link_drive)
@@ -190,7 +258,8 @@
 
                             @if ($pendaftaran->status_verifikasi === 'revisi')
                                 <div class="mt-3 p-3 bg-blue-50 text-blue-700 text-xs rounded">
-                                    Dokumen Anda perlu diperbaiki. Silakan perbarui berkas di folder Google Drive yang sudah Anda kirim.
+                                    Dokumen Anda perlu diperbaiki. Silakan perbarui berkas di folder
+                                    Google Drive yang sudah Anda kirim, lalu pastikan link tetap bisa diakses.
                                 </div>
                             @endif
                         </div>
@@ -205,19 +274,32 @@
                             </div>
                         @endif
 
-                        {{-- Info status bawah --}}
+                        {{-- Info status tambahan --}}
                         @switch($pendaftaran->status_verifikasi)
                             @case('pending')
-                                <p class="text-xs text-gray-500">Pendaftaran Anda sedang menunggu verifikasi admin.</p>
+                                <p class="text-xs text-gray-500">
+                                    Pendaftaran Anda sedang menunggu verifikasi admin.
+                                </p>
+                                @break
+                            @case('revisi')
+                                <p class="text-xs text-blue-600">
+                                    Beberapa data atau dokumen perlu direvisi. Silakan cek catatan admin di atas.
+                                </p>
                                 @break
                             @case('diterima')
-                                <p class="text-xs text-green-600">Pendaftaran Anda sudah diterima. Silakan menunggu info selanjutnya.</p>
+                                <p class="text-xs text-green-600">
+                                    Pendaftaran Anda sudah diterima. Silakan menunggu informasi teknis lebih lanjut.
+                                </p>
                                 @break
                             @case('aktif')
-                                <p class="text-xs text-green-600">Anda sedang menjalani periode magang. Pastikan link Drive tetap bisa diakses.</p>
+                                <p class="text-xs text-green-600">
+                                    Anda sedang menjalani periode magang. Pastikan link Drive tetap bisa diakses.
+                                </p>
                                 @break
                             @case('ditolak')
-                                <p class="text-xs text-red-500">Pendaftaran Anda ditolak. Silakan hubungi admin jika ingin mengajukan ulang.</p>
+                                <p class="text-xs text-red-500">
+                                    Pendaftaran Anda ditolak. Silakan hubungi admin jika ingin mengajukan ulang.
+                                </p>
                                 @break
                         @endswitch
                     @endif
