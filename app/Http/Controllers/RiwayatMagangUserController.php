@@ -15,6 +15,12 @@ class RiwayatMagangUserController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
+        $riwayat = RiwayatMagang::with(['pendaftaranMagang.members'])
+            ->where('user_id', auth()->id())
+            ->orderByDesc('tanggal_selesai')
+            ->get();
+
+
         return view('riwayat.user-index', [
             'riwayat' => $riwayat,
         ]);

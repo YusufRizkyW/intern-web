@@ -34,5 +34,12 @@ class RiwayatMagang extends Model
     {
         return $this->belongsTo(\App\Models\User::class);
     }
+
+    // App\Models\RiwayatMagang.php
+    public function pendaftaranMagang()
+    {
+        return $this->belongsTo(\App\Models\PendaftaranMagang::class);
+    }
+
     use HasFactory;
 }

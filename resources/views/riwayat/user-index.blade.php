@@ -40,25 +40,29 @@
                             <table class="min-w-full text-sm border border-gray-100">
                                 <thead class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wide">
                                     <tr>
-                                        <th class="px-4 py-2 border-b">Instansi</th>
+                                        <th class="px-4 py-2 border-b">Instansi / Asal</th>
                                         <th class="px-4 py-2 border-b">Periode</th>
+                                        <th class="px-4 py-2 border-b">Peserta / Tim</th>
                                         <th class="px-4 py-2 border-b">Catatan Admin</th>
                                         <th class="px-4 py-2 border-b text-center">Sertifikat</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y">
                                     @foreach ($riwayat as $item)
+                                        @php
+                                            $pendaftaran = $item->pendaftaranMagang ?? null;
+                                            $isTim = $pendaftaran?->tipe_pendaftaran === 'tim';
+                                            $anggota = $pendaftaran?->members ?? collect();
+                                        @endphp
+
                                         <tr class="hover:bg-gray-50 transition-colors">
                                             {{-- Instansi --}}
                                             <td class="px-4 py-3 align-top">
                                                 <div class="font-semibold text-gray-800">
-                                                    {{ $item->instansi_asal ?? 'BPS Gresik' }}
+                                                    {{ $pendaftaran?->agency ?? $item->instansi_asal ?? '-' }}
                                                 </div>
                                                 <div class="text-xs text-gray-500">
-                                                    {{ $item->nama_lengkap }}
-                                                    @if ($item->nim)
-                                                        ({{ $item->nim }})
-                                                    @endif
+                                                    {{ $pendaftaran?->tipe_pendaftaran === 'tim' ? 'Tim / Rombongan' : 'Individu' }}
                                                 </div>
                                             </td>
 
@@ -70,6 +74,35 @@
                                                     {{ \Carbon\Carbon::parse($item->tanggal_selesai)->translatedFormat('d M Y') }}
                                                 @else
                                                     <span class="text-gray-400 text-xs">-</span>
+                                                @endif
+                                            </td>
+
+                                            {{-- Peserta --}}
+                                            <td class="px-4 py-3 align-top text-xs text-gray-700">
+                                                @if ($isTim)
+                                                    <div class="font-medium text-gray-800 text-sm">
+                                                        Ketua: {{ $pendaftaran->nama_lengkap }}
+                                                    </div>
+                                                    <ul class="list-disc list-inside text-[11px] text-gray-600 mt-1">
+                                                        @foreach ($anggota as $m)
+                                                            <li>
+                                                                {{ $m->nama_anggota }}
+                                                                @if ($m->nim_anggota)
+                                                                    ({{ $m->nim_anggota }})
+                                                                @endif
+                                                                @if ($m->is_ketua)
+                                                                    <span class="text-blue-600 font-semibold">(Ketua)</span>
+                                                                @endif
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <div class="text-sm text-gray-800 font-medium">
+                                                        {{ $pendaftaran?->nama_lengkap ?? $item->nama_lengkap }}
+                                                    </div>
+                                                    <div class="text-xs text-gray-500">
+                                                        {{ $pendaftaran?->nim ?? $item->nim ?? '-' }}
+                                                    </div>
                                                 @endif
                                             </td>
 
