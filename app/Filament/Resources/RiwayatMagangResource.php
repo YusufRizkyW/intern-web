@@ -21,17 +21,19 @@ class RiwayatMagangResource extends Resource
     protected static ?int $navigationSort = 5;
     
 
-    public static function form(\Filament\Forms\Form $form): \Filament\Forms\Form
+    public static function form(Form $form): Form
     {
         return $form->schema([
+            // Akun pendaftar
             Forms\Components\Section::make('Akun pendaftar')
                 ->schema([
                     Forms\Components\Select::make('user_id')
-                            ->label('User')
-                            ->relationship('user', 'name')
-                            ->disabled(),
+                        ->label('User')
+                        ->relationship('user', 'name')
+                        ->disabled(),
                 ]),
-            
+
+            // Data pendaftar utama
             Forms\Components\Section::make('Data Pendaftar')
                 ->schema([
                     Forms\Components\TextInput::make('nama_lengkap')
@@ -53,16 +55,72 @@ class RiwayatMagangResource extends Resource
                     Forms\Components\TextInput::make('no_hp')
                         ->label('No. HP / WA')
                         ->disabled(),
+                ])
+                ->columns(2),
 
+            // 🔹 Tipe pendaftaran & anggota tim (READ ONLY)
+            Forms\Components\Section::make('Tipe Pendaftaran & Anggota Tim')
+                ->schema([
+                    Forms\Components\Placeholder::make('tipe_pendaftaran_info')
+                        ->label('Tipe Pendaftaran')
+                        ->content(function (\App\Models\RiwayatMagang $record) {
+                            $tipe = $record->pendaftaran?->tipe_pendaftaran;
+
+                            return match ($tipe) {
+                                'tim'      => 'Tim / Rombongan',
+                                'individu' => 'Individu (1 orang)',
+                                default    => '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('anggota_tim_info')
+                        ->label('Anggota Tim')
+                        ->content(function (\App\Models\RiwayatMagang $record) {
+                            $pendaftaran = $record->pendaftaran;
+                            if (! $pendaftaran) {
+                                return 'Data pendaftaran asal tidak ditemukan.';
+                            }
+
+                            $members = $pendaftaran->members;
+
+                            if (! $members || $members->isEmpty()) {
+                                return 'Tidak ada anggota tim (kemungkinan pendaftaran individu).';
+                            }
+
+                            return $members
+                                ->map(function ($m) {
+                                    $text = $m->nama_anggota;
+                                    if ($m->nim_anggota) {
+                                        $text .= ' (' . $m->nim_anggota . ')';
+                                    }
+                                    if ($m->is_ketua ?? false) {
+                                        $text .= ' – Ketua';
+                                    }
+                                    return $text;
+                                })
+                                ->implode("\n");
+                        })
+                        ->extraAttributes([
+                            'style' => 'white-space: pre-line;', // supaya newline kebaca
+                        ]),
+                ])
+                ->columns(1),
+
+            // Periode
+            Forms\Components\Section::make('Periode Magang')
+                ->schema([
                     Forms\Components\DatePicker::make('tanggal_mulai')
+                        ->label('Tanggal Mulai')
                         ->disabled(),
 
                     Forms\Components\DatePicker::make('tanggal_selesai')
+                        ->label('Tanggal Selesai')
                         ->disabled(),
-                        
-                ])->columns(2),
+                ])
+                ->columns(2),
 
-                Forms\Components\Section::make('Link Berkas')
+            // Link drive + status akhir
+            Forms\Components\Section::make('Berkas')
                 ->schema([
                     Forms\Components\TextInput::make('link_drive')
                         ->label('Link Google Drive')
@@ -73,8 +131,19 @@ class RiwayatMagangResource extends Resource
                                 ->url(fn ($record) => $record?->link_drive, shouldOpenInNewTab: true)
                                 ->tooltip('Buka Link Drive')
                         ),
-                ])->columns(1),
 
+                    Forms\Components\Select::make('status_verifikasi')
+                        ->label('Status Akhir')
+                        ->options([
+                            'selesai' => 'Selesai',
+                            'batal'   => 'Batal',
+                            'arsip'   => 'Arsip',
+                        ])
+                        ->disabled(),
+                ])
+                ->columns(2),
+
+            // Catatan & sertifikat (masih bisa diubah admin)
             Forms\Components\Section::make('Catatan & Sertifikat')
                 ->schema([
                     Forms\Components\Textarea::make('catatan_admin')
@@ -91,9 +160,9 @@ class RiwayatMagangResource extends Resource
                         ->downloadable()
                         ->openable(),
                 ]),
-            
         ]);
     }
+
 
     public static function table(Table $table): Table
     {
@@ -159,4 +228,5 @@ class RiwayatMagangResource extends Resource
             'edit' => Pages\EditRiwayatMagang::route('/{record}/edit'),
         ];
     }
+
 }
