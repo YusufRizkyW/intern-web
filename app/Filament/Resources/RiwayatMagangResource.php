@@ -64,7 +64,7 @@ class RiwayatMagangResource extends Resource
                     Forms\Components\Placeholder::make('tipe_pendaftaran_info')
                         ->label('Tipe Pendaftaran')
                         ->content(function (\App\Models\RiwayatMagang $record) {
-                            $tipe = $record->pendaftaran?->tipe_pendaftaran;
+                            $tipe = $record->pendaftaranMagang?->tipe_pendaftaran;
 
                             return match ($tipe) {
                                 'tim'      => 'Tim / Rombongan',
@@ -76,7 +76,7 @@ class RiwayatMagangResource extends Resource
                     Forms\Components\Placeholder::make('anggota_tim_info')
                         ->label('Anggota Tim')
                         ->content(function (\App\Models\RiwayatMagang $record) {
-                            $pendaftaran = $record->pendaftaran;
+                            $pendaftaran = $record->pendaftaranMagang;
                             if (! $pendaftaran) {
                                 return 'Data pendaftaran asal tidak ditemukan.';
                             }

@@ -25,7 +25,7 @@ class RiwayatMagang extends Model
         'file_sertifikat',
     ];
 
-    public function pendaftaran()
+    public function pendaftaranMagang()
     {
         return $this->belongsTo(PendaftaranMagang::class, 'pendaftaran_magang_id');
     }
