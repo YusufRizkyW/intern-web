@@ -7,6 +7,7 @@ use App\Http\Controllers\BerkasAdminController;
 use App\Http\Controllers\PendaftaranMagangStatusController;
 use App\Http\Controllers\RiwayatMagangUserController;
 
+
 // default route
 Route::get('/', function () {
     return view('welcome');

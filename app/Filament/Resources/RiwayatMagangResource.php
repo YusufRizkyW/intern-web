@@ -152,13 +152,13 @@ class RiwayatMagangResource extends Resource
                         ->helperText('Catatan ini akan terlihat oleh user')
                         ->columnSpanFull(),
 
-                    Forms\Components\FileUpload::make('file_sertifikat')
-                        ->label('Sertifikat (PDF)')
-                        ->disk('public')
-                        ->directory('sertifikat_magang')
-                        ->acceptedFileTypes(['application/pdf'])
-                        ->downloadable()
-                        ->openable(),
+                    // Forms\Components\FileUpload::make('file_sertifikat')
+                    //     ->label('Sertifikat (PDF)')
+                    //     ->disk('public')
+                    //     ->directory('sertifikat_magang')
+                    //     ->acceptedFileTypes(['application/pdf'])
+                    //     ->downloadable()
+                    //     ->openable(),
                 ]),
         ]);
     }
