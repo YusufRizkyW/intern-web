@@ -3,9 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PendaftaranMagangController;
-use App\Http\Controllers\BerkasAdminController;
 use App\Http\Controllers\PendaftaranMagangStatusController;
 use App\Http\Controllers\RiwayatMagangUserController;
+use App\Http\Controllers\DashboardController;
 
 
 // default route
@@ -13,10 +13,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// dashboard
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+// // dashboard
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard');
 
 
 // ====================
@@ -59,14 +61,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
-// ====================
-// ADMIN-ONLY ROUTES
-// ====================
-Route::middleware(['auth', 'ensureIsAdmin'])->group(function () {
-    Route::get('/admin/berkas/{id}/view', [BerkasAdminController::class, 'view'])
-        ->name('admin.berkas.view');
-});
 
 Route::get('/whoami', function () {
     return auth()->user();

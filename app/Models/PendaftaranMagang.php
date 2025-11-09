@@ -32,9 +32,14 @@ class PendaftaranMagang extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
     
+    // public function members()
+    // {
+    //     return $this->hasMany(\App\Models\PendaftaranMagangMember::class);
+    // }
+
     public function members()
     {
-        return $this->hasMany(\App\Models\PendaftaranMagangMember::class);
+        return $this->hasMany(PendaftaranMagangMember::class, 'pendaftaran_magang_id');
     }
     
 
