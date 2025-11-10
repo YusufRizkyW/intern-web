@@ -12,14 +12,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let count = typeof initialCount !== 'undefined' ? initialCount : 1;
 
+    function setDisabled(container, disabled) {
+        container.querySelectorAll('input, select, textarea').forEach(el => {
+            el.disabled = disabled;
+        });
+    }
+
     if (tipe) {
         function toggleTipe() {
             if (tipe.value === 'tim') {
                 formTim.classList.remove('hidden');
+                setDisabled(formTim, false);
+
                 formIndividu.classList.add('hidden');
+                setDisabled(formIndividu, true);
             } else {
                 formIndividu.classList.remove('hidden');
+                setDisabled(formIndividu, false);
+
                 formTim.classList.add('hidden');
+                setDisabled(formTim, true);
             }
         }
 

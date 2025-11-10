@@ -125,15 +125,28 @@ class DashboardController extends Controller
         // -- debug sementara (uncomment jika butuh) --
         // \Log::debug('calendarGlobal', $calendarGlobal);
         // dd($calendarGlobal);
+        // dd($stats);
 
-        return view('dashboard', [
-            'stats'            => $stats,
-            'pendaftaranTerbaru'=> $pendaftaranTerbaru,
-            'calendarGlobal'   => $calendarGlobal,
-            'userActiveDates'  => $userActiveDates,
-            'currentMonth'     => $currentMonth,
-            'startOfCalendar'  => $startOfCalendar,
-            'endOfCalendar'    => $endOfCalendar,
-        ]);
+        // ... setelah membangun $calendarGlobal, $userActiveDates, dll
+
+        $data = [
+            'stats'             => $stats,
+            'pendaftaranTerbaru' => $pendaftaranTerbaru,
+            'calendarGlobal'    => $calendarGlobal,
+            'userActiveDates'   => $userActiveDates,
+            'currentMonth'      => $currentMonth,
+            'startOfCalendar'   => $startOfCalendar,
+            'endOfCalendar'     => $endOfCalendar,
+        ];
+
+        // jika request AJAX (fetch dari JS), kembalikan hanya partial calendar
+        if ($request->ajax() || $request->wantsJson()) {
+            // partial view hanya berisi isi kalender (grid + legend + header)
+            return view('dashboard._calendar', $data)->render();
+        }
+
+        // default: render halaman penuh
+        return view('dashboard', $data);
+
     }
 }

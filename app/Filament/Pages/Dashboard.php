@@ -20,10 +20,10 @@ class Dashboard extends Page
     protected function getHeaderWidgets(): array
     {
         return [
+            RecentPendaftarTable::class,
             PendaftaranStatsOverview::class,
             PendaftaranPerBulanChart::class,
             TipePendaftaranPieChart::class,
-            RecentPendaftarTable::class,
         ];
     }
 

@@ -15,6 +15,7 @@ class PendaftaranMagangController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         // 1. VALIDASI UMUM (selalu wajib)
         $request->validate([
             'tipe_pendaftaran' => 'required|in:individu,tim',
@@ -27,6 +28,7 @@ class PendaftaranMagangController extends Controller
         if ($request->tipe_pendaftaran === 'individu') {
             $request->validate([
                 'nama_lengkap' => 'required|string|max:255',
+                'agency'       => 'required|string|max:255',
                 'nim'          => 'nullable|string|max:50',
                 'email'        => 'nullable|email|max:255',
                 'no_hp'        => 'nullable|string|max:30',
