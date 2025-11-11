@@ -8,15 +8,20 @@ use App\Filament\Widgets\PendaftaranPerBulanChart;
 use App\Filament\Widgets\TipePendaftaranPieChart;
 use App\Filament\Widgets\RecentPendaftarTable;
 
-
 class Dashboard extends Page
 {
+    // Konfigurasi navigasi dan halaman
     protected static ?string $navigationIcon = 'heroicon-o-home';
     protected static string $view = 'filament.pages.dashboard';
     protected static ?string $title = 'Dashboard';
     protected static ?string $navigationLabel = 'Dashboard';
     protected static ?string $slug = 'dashboard';
 
+    /**
+     * Mendefinisikan widget yang ditampilkan di header
+     *
+     * @return array
+     */
     protected function getHeaderWidgets(): array
     {
         return [
@@ -27,7 +32,11 @@ class Dashboard extends Page
         ];
     }
 
-    // Layout kolom: bar + pie bisa sejajar
+    /**
+     * Mengatur layout kolom untuk widget
+     *
+     * @return int|string|array
+     */
     protected function getColumns(): int|string|array
     {
         return [

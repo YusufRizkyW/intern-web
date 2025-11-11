@@ -13,10 +13,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// // dashboard
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->name('dashboard');
+// dashboard route
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
 
@@ -62,9 +59,9 @@ Route::middleware('auth')->group(function () {
 });
 
 
-Route::get('/whoami', function () {
-    return auth()->user();
-});
+// Route::get('/whoami', function () {
+//     return auth()->user();
+// });
 
 
 require __DIR__.'/auth.php';
