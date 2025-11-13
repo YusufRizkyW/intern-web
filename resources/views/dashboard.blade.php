@@ -84,7 +84,7 @@
 
             {{-- SECTION 1.25: KALENDER --}}
             {{-- masukkan partial --}}
-            @include('_calendar')
+            @include('dashboard._calendar')
 
             {{-- SECTION 1.5: STATISTIK SINGKAT --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -322,4 +322,5 @@
     </div>
 
 @vite('resources/js/dashboard.js')
+
 </x-app-layout>
