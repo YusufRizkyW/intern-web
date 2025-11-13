@@ -7,6 +7,7 @@ use App\Filament\Widgets\PendaftaranStatsOverview;
 use App\Filament\Widgets\PendaftaranPerBulanChart;
 use App\Filament\Widgets\TipePendaftaranPieChart;
 use App\Filament\Widgets\RecentPendaftarTable;
+use App\Filament\Widgets\CalendarMagangWidget;
 
 class Dashboard extends Page
 {
@@ -19,12 +20,13 @@ class Dashboard extends Page
 
     /**
      * Mendefinisikan widget yang ditampilkan di header
-     *
+     *x
      * @return array
      */
     protected function getHeaderWidgets(): array
     {
         return [
+            CalendarMagangWidget::class,
             RecentPendaftarTable::class,
             PendaftaranStatsOverview::class,
             PendaftaranPerBulanChart::class,
