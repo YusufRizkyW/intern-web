@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PendaftaranMagang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\PendaftaranMagang;
 
 class PendaftaranMagangController extends Controller
 {
@@ -156,6 +156,126 @@ class PendaftaranMagangController extends Controller
             return back()
                 ->withErrors('Terjadi kesalahan saat menyimpan data: ' . $e->getMessage())
                 ->withInput();
+        }
+    }
+
+    public function edit(PendaftaranMagang $pendaftaran)
+    {
+        // Cek apakah pendaftaran milik user yang login
+        if ($pendaftaran->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Cek apakah status masih pending
+        if ($pendaftaran->status_verifikasi !== 'pending') {
+            return redirect()
+                ->route('pendaftaran.status')
+                ->with('error', 'Pendaftaran tidak dapat diedit. Status saat ini: ' . $pendaftaran->status_verifikasi);
+        }
+
+        return view('pendaftaran.edit', compact('pendaftaran'));
+    }
+
+    public function update(Request $request, PendaftaranMagang $pendaftaran)
+    {
+        // Cek apakah pendaftaran milik user yang login
+        if ($pendaftaran->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Cek apakah status masih pending
+        if ($pendaftaran->status_verifikasi !== 'pending') {
+            return redirect()
+                ->route('pendaftaran.status')
+                ->with('error', 'Pendaftaran tidak dapat diedit. Status saat ini: ' . $pendaftaran->status_verifikasi);
+        }
+
+        // 1. VALIDASI UMUM (selalu wajib)
+        $request->validate([
+            'tipe_pendaftaran' => 'required|in:individu,tim',
+            'tipe_periode'     => 'required|in:durasi,tanggal',
+            'link_drive'       => ['required','url','regex:/^https:\/\/(drive|docs)\.google\.com/'],
+            'agency'           => 'required|string|max:255',
+        ]);
+
+        // 2. VALIDASI PER TIPE PENDAFTARAN
+        if ($request->tipe_pendaftaran === 'individu') {
+            $request->validate([
+                'nama_lengkap' => 'required|string|max:255',
+                'nim'          => 'nullable|string|max:50',
+                'email'        => 'required|email|max:255',
+                'no_hp'        => 'required|string|max:20',
+            ]);
+        } else {
+            $request->validate([
+                'anggota'                    => 'required|array|min:1',
+                'anggota.*.nama'             => 'required|string|max:255',
+                'anggota.*.nim'              => 'nullable|string|max:50',
+                'anggota.*.email'            => 'nullable|email|max:255',
+                'anggota.*.no_hp'            => 'nullable|string|max:20',
+            ]);
+        }
+
+        // 3. VALIDASI PERIODE
+        if ($request->tipe_periode === 'durasi') {
+            $request->validate([
+                'durasi_bulan' => 'required|integer|min:1|max:12',
+            ]);
+            $tanggalMulai = null;
+            $tanggalSelesai = null;
+        } else {
+            $request->validate([
+                'tanggal_mulai'   => 'required|date',
+                'tanggal_selesai' => 'required|date|after:tanggal_mulai',
+            ]);
+            $tanggalMulai = $request->tanggal_mulai;
+            $tanggalSelesai = $request->tanggal_selesai;
+        }
+
+        DB::beginTransaction();
+        try {
+            // Update data pendaftaran utama
+            $pendaftaran->update([
+                'tipe_pendaftaran' => $request->tipe_pendaftaran,
+                'nama_lengkap'     => $request->nama_lengkap ?? $request->anggota[0]['nama'] ?? '',
+                'nim'              => $request->nim ?? $request->anggota[0]['nim'] ?? null,
+                'email'            => $request->email ?? $request->anggota[0]['email'] ?? '',
+                'no_hp'            => $request->no_hp ?? $request->anggota[0]['no_hp'] ?? '',
+                'agency'           => $request->agency,
+                'tipe_periode'     => $request->tipe_periode,
+                'durasi_bulan'     => $request->durasi_bulan,
+                'tanggal_mulai'    => $tanggalMulai,
+                'tanggal_selesai'  => $tanggalSelesai,
+                'link_drive'       => $request->link_drive,
+            ]);
+
+            // Update anggota tim (hapus yang lama, buat yang baru)
+            if ($request->tipe_pendaftaran === 'tim' && $request->has('anggota')) {
+                // Hapus anggota lama
+                $pendaftaran->members()->delete();
+                
+                // Buat anggota baru
+                foreach ($request->anggota as $anggota) {
+                    $pendaftaran->members()->create([
+                        'nama_anggota'  => $anggota['nama'],
+                        'nim_anggota'   => $anggota['nim'],
+                        'email_anggota' => $anggota['email'],
+                        'no_hp_anggota' => $anggota['no_hp'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+            
+            return redirect()
+                ->route('pendaftaran.status')
+                ->with('success', 'Pendaftaran berhasil diperbarui!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }

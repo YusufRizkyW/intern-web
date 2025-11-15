@@ -71,7 +71,7 @@
                                     <span class="font-semibold text-gray-600">Jenis pendaftaran:</span>
                                     @if ($pendaftaran->tipe_pendaftaran === 'tim')
                                         <span class="px-2 py-1 rounded bg-blue-100 text-blue-800 font-semibold">
-                                            Tim / Rombongan
+                                            Tim
                                         </span>
                                     @else
                                         <span class="px-2 py-1 rounded bg-gray-100 text-gray-800 font-semibold">
@@ -277,29 +277,113 @@
                         {{-- Info status tambahan --}}
                         @switch($pendaftaran->status_verifikasi)
                             @case('pending')
-                                <p class="text-xs text-gray-500">
-                                    Pendaftaran Anda sedang menunggu verifikasi admin.
-                                </p>
+                                <div class="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded">
+                                    <div>
+                                        <p class="text-sm text-yellow-700 font-medium">
+                                            Pendaftaran Anda sedang menunggu verifikasi admin.
+                                        </p>
+                                        <p class="text-xs text-yellow-600">
+                                            Anda masih bisa mengedit pendaftaran selama status masih pending.
+                                        </p>
+                                    </div>
+                                    <a href="{{ route('pendaftaran.edit', $pendaftaran->id) }}"
+                                       class="bg-yellow-600 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-yellow-700 transition">
+                                        Edit Pendaftaran
+                                    </a>
+                                </div>
                                 @break
+                                
                             @case('revisi')
-                                <p class="text-xs text-blue-600">
-                                    Beberapa data atau dokumen perlu direvisi. Silakan cek catatan admin di atas.
-                                </p>
+                                <div class="p-4 bg-blue-50 border border-blue-200 rounded">
+                                    <p class="text-sm text-blue-700 font-medium mb-2">
+                                        Beberapa data atau dokumen perlu direvisi.
+                                    </p>
+                                    <p class="text-xs text-blue-600 mb-3">
+                                        Silakan cek catatan admin di atas dan perbaiki sesuai petunjuk.
+                                    </p>
+                                    <p class="text-xs text-blue-500">
+                                        <strong>Catatan:</strong> Saat status revisi, Anda tidak dapat mengedit form. 
+                                        Silakan perbaiki dokumen di Google Drive dan hubungi admin.
+                                    </p>
+                                </div>
                                 @break
+                                
                             @case('diterima')
-                                <p class="text-xs text-green-600">
-                                    Pendaftaran Anda sudah diterima. Silakan menunggu informasi teknis lebih lanjut.
-                                </p>
+                                <div class="p-4 bg-green-50 border border-green-200 rounded">
+                                    <p class="text-sm text-green-700 font-medium">
+                                        🎉 Selamat! Pendaftaran Anda sudah diterima.
+                                    </p>
+                                    <p class="text-xs text-green-600">
+                                        Silakan menunggu informasi teknis lebih lanjut dari admin.
+                                    </p>
+                                </div>
                                 @break
+                                
                             @case('aktif')
-                                <p class="text-xs text-green-600">
-                                    Anda sedang menjalani periode magang. Pastikan link Drive tetap bisa diakses.
-                                </p>
+                                <div class="p-4 bg-green-50 border border-green-200 rounded">
+                                    <p class="text-sm text-green-700 font-medium">
+                                        🚀 Anda sedang menjalani periode magang.
+                                    </p>
+                                    <p class="text-xs text-green-600">
+                                        Pastikan link Google Drive tetap bisa diakses untuk monitoring progress.
+                                    </p>
+                                </div>
                                 @break
+                                
                             @case('ditolak')
-                                <p class="text-xs text-red-500">
-                                    Pendaftaran Anda ditolak. Silakan hubungi admin jika ingin mengajukan ulang.
-                                </p>
+                                <div class="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded">
+                                    <div>
+                                        <p class="text-sm text-red-700 font-medium">
+                                            Pendaftaran Anda ditolak.
+                                        </p>
+                                        <p class="text-xs text-red-600">
+                                            Silakan hubungi admin untuk informasi lebih lanjut atau ajukan pendaftaran baru.
+                                        </p>
+                                    </div>
+                                    <a href="{{ route('pendaftaran.create') }}"
+                                       class="bg-red-600 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-red-700 transition">
+                                        Ajukan Ulang
+                                    </a>
+                                </div>
+                                @break
+                                
+                            @case('diterima')
+                                <div class="p-4 bg-green-50 border border-green-200 rounded">
+                                    <p class="text-sm text-green-700 font-medium">
+                                        🎉 Selamat! Pendaftaran Anda sudah diterima.
+                                    </p>
+                                    <p class="text-xs text-green-600">
+                                        Silakan menunggu informasi teknis lebih lanjut dari admin.
+                                    </p>
+                                </div>
+                                @break
+                                
+                            @case('aktif')
+                                <div class="p-4 bg-green-50 border border-green-200 rounded">
+                                    <p class="text-sm text-green-700 font-medium">
+                                        🚀 Anda sedang menjalani periode magang.
+                                    </p>
+                                    <p class="text-xs text-green-600">
+                                        Pastikan link Google Drive tetap bisa diakses untuk monitoring progress.
+                                    </p>
+                                </div>
+                                @break
+                                
+                            @case('ditolak')
+                                <div class="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded">
+                                    <div>
+                                        <p class="text-sm text-red-700 font-medium">
+                                            Pendaftaran Anda ditolak.
+                                        </p>
+                                        <p class="text-xs text-red-600">
+                                            Silakan hubungi admin untuk informasi lebih lanjut atau ajukan pendaftaran baru.
+                                        </p>
+                                    </div>
+                                    <a href="{{ route('pendaftaran.create') }}"
+                                       class="bg-red-600 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-red-700 transition">
+                                        Ajukan Ulang
+                                    </a>
+                                </div>
                                 @break
                         @endswitch
                     @endif

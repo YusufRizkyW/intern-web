@@ -54,7 +54,7 @@
                                     class="w-full border rounded p-2 text-sm focus:ring-red-500 focus:border-red-500">
                                 <option value="">-- pilih --</option>
                                 <option value="individu" {{ old('tipe_pendaftaran','individu') === 'individu' ? 'selected' : '' }}>Individu (1 orang)</option>
-                                <option value="tim" {{ old('tipe_pendaftaran') === 'tim' ? 'selected' : '' }}>Tim / Rombongan</option>
+                                <option value="tim" {{ old('tipe_pendaftaran') === 'tim' ? 'selected' : '' }}>Tim</option>
                             </select>
                             <p class="text-xs text-gray-500">
                                 Pilih <b>Tim</b> kalau Anda mewakili sekolah dan ingin mendaftarkan beberapa siswa sekaligus.
