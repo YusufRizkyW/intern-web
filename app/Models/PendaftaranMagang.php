@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PendaftaranMagang extends Model
 {
@@ -36,9 +36,31 @@ class PendaftaranMagang extends Model
     {
         return $this->hasMany(PendaftaranMagangMember::class, 'pendaftaran_magang_id');
     }
-    
 
+    public function statusLogs(): HasMany
+    {
+        return $this->hasMany(PendaftaranStatusLog::class);
+    }
 
-    use HasFactory;
+    // Event untuk mencatat perubahan status
+    protected static function booted(): void
+    {
+        static::updating(function (PendaftaranMagang $pendaftaran) {
+            // Cek apakah status_verifikasi berubah
+            if ($pendaftaran->isDirty('status_verifikasi')) {
+                $statusLama = $pendaftaran->getOriginal('status_verifikasi');
+                $statusBaru = $pendaftaran->status_verifikasi;
+                
+                // Simpan log perubahan status
+                PendaftaranStatusLog::create([
+                    'pendaftaran_magang_id' => $pendaftaran->id,
+                    'admin_user_id' => auth()->id(), // ID admin yang sedang login
+                    'status_lama' => $statusLama,
+                    'status_baru' => $statusBaru,
+                    'catatan' => $pendaftaran->catatan_admin,
+                ]);
+            }
+        });
+    }
 }
 

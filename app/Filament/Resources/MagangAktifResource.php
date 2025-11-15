@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MagangAktifResource\Pages;
 use App\Filament\Resources\PendaftaranMagangResource\RelationManagers\MembersRelationManager;
+use App\Filament\Resources\PendaftaranMagangResource\RelationManagers\StatusLogsRelationManager;
 use App\Models\PendaftaranMagang;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -215,6 +216,7 @@ class MagangAktifResource extends Resource
     {
         return [
             MembersRelationManager::class,
+            StatusLogsRelationManager::class,
             // kalau nanti kamu bikin tabel berkas, tinggal tambah di sini
             // BerkasPendaftaranRelationManager::class,
         ];

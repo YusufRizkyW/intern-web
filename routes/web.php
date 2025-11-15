@@ -38,10 +38,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pendaftaran', [PendaftaranMagangController::class, 'create'])
         ->name('pendaftaran');
 
-    // upload ulang satu dokumen yang invalid
-    Route::post('/status-pendaftaran/berkas/{id}/reupload', [PendaftaranMagangStatusController::class, 'reuploadBerkas'])
-        ->name('pendaftaran.reupload');
-
     // Halaman riwayat magang user
     Route::get('/riwayat-magang', [RiwayatMagangUserController::class, 'index'])
         ->name('riwayat.user.index');

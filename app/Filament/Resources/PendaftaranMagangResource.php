@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PendaftaranMagangResource\Pages;
 use App\Filament\Resources\PendaftaranMagangResource\RelationManagers\MembersRelationManager;
+use App\Filament\Resources\PendaftaranMagangResource\RelationManagers\StatuslogsRelationManager;
 use App\Models\PendaftaranMagang;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -231,6 +232,7 @@ class PendaftaranMagangResource extends Resource
     {
         return [
             MembersRelationManager::class,
+            StatusLogsRelationManager::class,
             // kalau nanti kamu bikin tabel berkas, tinggal tambah di sini
             // BerkasPendaftaranRelationManager::class,
         ];
