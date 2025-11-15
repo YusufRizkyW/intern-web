@@ -34,7 +34,7 @@
         </div>
         <div class="relative">
           <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.2684891929737!2d112.65344347590614!3d-7.327012072009788!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e1c9c5b5b5b5%3A0x1c2c2c2c2c2c2c2c!2sBPS%20Kabupaten%20Gresik!5e0!3m2!1sid!2sid!4v1699999999999!5m2!1sid!2sid"
+            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3803.9996094962216!2d112.5903012!3d-7.1682691!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e77ffb9491f8db1%3A0x38d80cc3f95fbc64!2sBadan%20Pusat%20Statistik%20Kabupaten%20Gresik!5e1!3m2!1sid!2sid!4v1763213290980!5m2!1sid!2sid"
             width="100%" 
             height="200" 
             style="border:0;" 
