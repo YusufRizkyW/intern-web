@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 
 class PendaftaranMagangResource extends Resource
@@ -20,7 +21,7 @@ class PendaftaranMagangResource extends Resource
     protected static ?string $navigationIcon  = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'Pendaftar';
     protected static ?string $navigationGroup = 'Magang';
-    protected static ?int    $navigationSort  = 1;
+    protected static ?int    $navigationSort  = 2;
 
     public static function form(Form $form): Form
     {
@@ -204,7 +205,36 @@ class PendaftaranMagangResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->mutateFormDataUsing(function (array $data, $record): array {
+                        // Jika status diubah ke 'diterima', validasi kuota
+                        if ($data['status_verifikasi'] === 'diterima' && 
+                            $record->status_verifikasi !== 'diterima') {
+                            
+                            if (!$record->canBeApproved()) {
+                                $periodeIssue = $record->periode_tidak_tersedia;
+                                
+                                if ($periodeIssue) {
+                                    $message = "Kuota tidak cukup untuk periode {$periodeIssue['nama_bulan']} {$periodeIssue['tahun']}. " .
+                                              "Dibutuhkan: {$periodeIssue['dibutuhkan']} peserta, " .
+                                              "Sisa kuota: {$periodeIssue['sisa_kuota']} peserta.";
+                                } else {
+                                    $message = "Kuota tidak tersedia untuk periode magang ini.";
+                                }
+                                
+                                Notification::make()
+                                    ->title('Kuota Tidak Cukup!')
+                                    ->body($message)
+                                    ->danger()
+                                    ->send();
+                                
+                                // Reset status ke semula
+                                $data['status_verifikasi'] = $record->status_verifikasi;
+                            }
+                        }
+                        
+                        return $data;
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
