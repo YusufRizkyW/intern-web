@@ -124,13 +124,48 @@ class PendaftaranMagangResource extends Resource
                             'revisi'   => 'Perlu Revisi',
                             'diterima' => 'Diterima',
                             'ditolak'  => 'Ditolak',
-                            // nanti kalau mau lanjut pipeline bisa tambahin:
                             // 'aktif'    => 'Sedang Magang',
                             // 'selesai'  => 'Selesai',
                             // 'batal'    => 'Dibatalkan',
                             // 'arsip'    => 'Diarsipkan',
                         ])
-                        ->required(),
+                        ->required()
+                        ->reactive()
+                        ->helperText(function (Forms\Get $get, ?\Illuminate\Database\Eloquent\Model $record) {
+                            if (!$record) return null;
+                            
+                            $statusBaru = $get('status_verifikasi');
+                            $statusLama = $record->getOriginal('status_verifikasi');
+                            
+                            // Jika akan diubah ke 'diterima', cek kuota
+                            if ($statusBaru === 'diterima' && $statusLama !== 'diterima') {
+                                $validation = $record->canBeApprovedDetailed();
+                                
+                                if (!$validation['can_approve']) {
+                                    return '⚠️ ' . $validation['message'];
+                                } else {
+                                    return '✅ ' . $validation['message'];
+                                }
+                            }
+                            
+                            return null;
+                        })
+                        ->rules([
+                            function () {
+                                return function (string $attribute, $value, \Closure $fail) {
+                                    if ($value === 'diterima') {
+                                        $record = request()->route('record');
+                                        if ($record && $record->getOriginal('status_verifikasi') !== 'diterima') {
+                                            $validation = $record->canBeApprovedDetailed();
+                                            
+                                            if (!$validation['can_approve']) {
+                                                $fail($validation['message']);
+                                            }
+                                        }
+                                    }
+                                };
+                            }
+                        ]),
                 ]),
         ]);
     }
@@ -205,26 +240,71 @@ class PendaftaranMagangResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                
+                Tables\Actions\Action::make('approve')
+                    ->label('Setujui')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn (PendaftaranMagang $record): bool => $record->status_verifikasi === 'pending')
+                    ->requiresConfirmation()
+                    ->modalHeading('Setujui Pendaftaran')
+                    ->modalDescription(function (PendaftaranMagang $record) {
+                        $validation = $record->canBeApprovedDetailed();
+                        return $validation['message'];
+                    })
+                    ->modalSubmitActionLabel('Ya, Setujui')
+                    ->action(function (PendaftaranMagang $record) {
+                        $validation = $record->canBeApprovedDetailed();
+                        
+                        if (!$validation['can_approve']) {
+                            Notification::make()
+                                ->title('Gagal Menyetujui!')
+                                ->body($validation['message'])
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+                        
+                        $record->update(['status_verifikasi' => 'diterima']);
+                        
+                        Notification::make()
+                            ->title('Berhasil!')
+                            ->body('Pendaftaran berhasil disetujui')
+                            ->success()
+                            ->send();
+                    }),
+
+                Tables\Actions\Action::make('reject')
+                    ->label('Tolak')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn (PendaftaranMagang $record): bool => in_array($record->status_verifikasi, ['pending', 'diterima']))
+                    ->requiresConfirmation()
+                    ->modalHeading('Tolak Pendaftaran')
+                    ->modalDescription('Apakah Anda yakin ingin menolak pendaftaran ini?')
+                    ->modalSubmitActionLabel('Ya, Tolak')
+                    ->action(function (PendaftaranMagang $record) {
+                        $record->update(['status_verifikasi' => 'ditolak']);
+                        
+                        Notification::make()
+                            ->title('Berhasil!')
+                            ->body('Pendaftaran berhasil ditolak')
+                            ->success()
+                            ->send();
+                    }),
+                    
                 Tables\Actions\EditAction::make()
                     ->mutateFormDataUsing(function (array $data, $record): array {
                         // Jika status diubah ke 'diterima', validasi kuota
                         if ($data['status_verifikasi'] === 'diterima' && 
                             $record->status_verifikasi !== 'diterima') {
                             
-                            if (!$record->canBeApproved()) {
-                                $periodeIssue = $record->periode_tidak_tersedia;
-                                
-                                if ($periodeIssue) {
-                                    $message = "Kuota tidak cukup untuk periode {$periodeIssue['nama_bulan']} {$periodeIssue['tahun']}. " .
-                                              "Dibutuhkan: {$periodeIssue['dibutuhkan']} peserta, " .
-                                              "Sisa kuota: {$periodeIssue['sisa_kuota']} peserta.";
-                                } else {
-                                    $message = "Kuota tidak tersedia untuk periode magang ini.";
-                                }
-                                
+                            $validation = $record->canBeApprovedDetailed();
+                            
+                            if (!$validation['can_approve']) {
                                 Notification::make()
                                     ->title('Kuota Tidak Cukup!')
-                                    ->body($message)
+                                    ->body($validation['message'])
                                     ->danger()
                                     ->send();
                                 
@@ -242,9 +322,7 @@ class PendaftaranMagangResource extends Resource
     }
 
     /**
-     * Di resource ini kita TAMPILKAN dulu pendaftar yang masih “di depan”
-     * (pending, revisi, ditolak). Yang sudah diterima / aktif nanti bisa
-     * dipisah ke resource lain seperti MagangDiterimaResource.
+     * Tampilkan semua pendaftaran untuk pengelolaan admin
      */
     public static function getEloquentQuery(): Builder
     {
@@ -253,8 +331,9 @@ class PendaftaranMagangResource extends Resource
             ->whereIn('status_verifikasi', [
                 'pending',
                 'revisi',
-                // 'ditolak',
-                // 'diterima', // ini aku ikutkan juga biar admin masih bisa ubah
+                'diterima',
+                'aktif',
+                // 'ditolak', 'selesai', 'batal', 'arsip' sudah pindah ke riwayat
             ]);
     }
 

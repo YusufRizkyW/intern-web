@@ -99,6 +99,15 @@ class PendaftaranMagang extends Model
             $statusLama = $pendaftaran->getOriginal('status_verifikasi');
             $statusBaru = $pendaftaran->status_verifikasi;
 
+            // ✅ VALIDASI KUOTA SEBELUM APPROVE
+            if ($statusBaru === 'diterima' && $statusLama !== 'diterima') {
+                $validation = $pendaftaran->canBeApprovedDetailed();
+                
+                if (!$validation['can_approve']) {
+                    throw new \Exception("Tidak dapat menyetujui pendaftaran: " . $validation['message']);
+                }
+            }
+
             // ✅ PERBAIKAN: Status yang masih AKTIF menggunakan kuota
             $statusTerpakai = ['diterima', 'aktif']; // Hapus 'selesai'
             
@@ -130,8 +139,8 @@ class PendaftaranMagang extends Model
                 ]);
             }
 
-            // Pindahkan ke riwayat (tetap sama)
-            $statusRiwayat = ['selesai', 'batal', 'arsip'];
+            // Pindahkan ke riwayat (tambah status ditolak)
+            $statusRiwayat = ['selesai', 'batal', 'arsip', 'ditolak'];
             if (in_array($statusBaru, $statusRiwayat) && !in_array($statusLama, $statusRiwayat)) {
                 \App\Models\RiwayatMagang::create([
                     'pendaftaran_magang_id' => $pendaftaran->id,
@@ -176,37 +185,46 @@ class PendaftaranMagang extends Model
     }
 
     /**
-     * Validasi kuota sebelum approve - cek semua periode
+     * Cek apakah pendaftaran ini bisa disetujui berdasarkan kuota (detailed)
      */
-    public function canBeApproved(): bool
+    public function canBeApprovedDetailed(): array
     {
-        // Hanya cek kuota jika akan mengubah dari tidak-terpakai ke terpakai
-        $statusTerpakai = ['diterima', 'aktif', 'selesai'];
-        
-        if (in_array($this->status_verifikasi, $statusTerpakai)) {
-            return true; // Status sudah terpakai kuota, tidak perlu cek lagi
-        }
-
-        $jumlahPeserta = $this->jumlah_peserta;
         $periodeMagang = $this->periode_magang;
-
-        // Cek setiap periode, semua harus tersedia
+        $jumlahPeserta = $this->jumlah_peserta;
+        
+        $periodeBermasalah = [];
+        
         foreach ($periodeMagang as $periode) {
             $kuota = KuotaMagang::getKuotaForPeriode(
                 $periode['tahun'],
                 $periode['bulan']
             );
-
+            
             if (!$kuota) {
-                return false; // Tidak ada kuota untuk periode ini
-            }
-
-            if (!$kuota->isKuotaAvailable($jumlahPeserta)) {
-                return false; // Kuota tidak cukup untuk periode ini
+                $namaBulan = KuotaMagang::getNamaBulan($periode['bulan']);
+                $periodeBermasalah[] = "{$namaBulan} {$periode['tahun']} (Kuota belum dibuat)";
+            } elseif (!$kuota->isKuotaAvailable($jumlahPeserta)) {
+                $namaBulan = KuotaMagang::getNamaBulan($periode['bulan']);
+                $periodeBermasalah[] = "{$namaBulan} {$periode['tahun']} (Sisa: {$kuota->sisa_kuota}, Butuh: {$jumlahPeserta})";
             }
         }
+        
+        return [
+            'can_approve' => empty($periodeBermasalah),
+            'problematic_periods' => $periodeBermasalah,
+            'message' => empty($periodeBermasalah) 
+                ? 'Kuota tersedia untuk semua periode' 
+                : 'Kuota tidak cukup untuk periode: ' . implode(', ', $periodeBermasalah)
+        ];
+    }
 
-        return true; // Semua periode OK
+    /**
+     * Validasi kuota sebelum approve - cek semua periode (simple boolean)
+     */
+    public function canBeApproved(): bool
+    {
+        $validation = $this->canBeApprovedDetailed();
+        return $validation['can_approve'];
     }
 
     /**
@@ -214,27 +232,8 @@ class PendaftaranMagang extends Model
      */
     public function getPeriodeTidakTersediaAttribute(): ?array
     {
-        $jumlahPeserta = $this->jumlah_peserta;
-        $periodeMagang = $this->periode_magang;
-
-        foreach ($periodeMagang as $periode) {
-            $kuota = KuotaMagang::getKuotaForPeriode(
-                $periode['tahun'],
-                $periode['bulan']
-            );
-
-            if (!$kuota || !$kuota->isKuotaAvailable($jumlahPeserta)) {
-                return [
-                    'tahun' => $periode['tahun'],
-                    'bulan' => $periode['bulan'],
-                    'nama_bulan' => KuotaMagang::getNamaBulan($periode['bulan']),
-                    'sisa_kuota' => $kuota ? $kuota->sisa_kuota : 0,
-                    'dibutuhkan' => $jumlahPeserta
-                ];
-            }
-        }
-
-        return null;
+        $validation = $this->canBeApprovedDetailed();
+        return $validation['can_approve'] ? null : $validation;
     }
 
     // Method lama untuk backward compatibility

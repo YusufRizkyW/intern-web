@@ -25,7 +25,7 @@
                     </x-nav-link>
 
                     <x-nav-link :href="route('riwayat.user.index')" :active="request()->routeIs('riwayat.user.index')" class="text-white hover:text-gray-200">
-                        {{ __('Riwayat Magang') }}
+                        {{ __('Riwayat') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -96,7 +96,7 @@
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('riwayat.user.index')" :active="request()->routeIs('riwayat.user.index')" class="text-white hover:text-gray-200 hover:bg-white/10">
-                {{ __('Riwayat Magang') }}
+                {{ __('Riwayat') }}
             </x-responsive-nav-link>
         </div>
 

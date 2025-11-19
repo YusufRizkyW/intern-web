@@ -43,7 +43,7 @@ class RiwayatMagang extends Model
     protected static function booted(): void
     {
         static::saving(function (RiwayatMagang $riwayat) {
-            $validStatuses = ['selesai', 'batal', 'arsip'];
+            $validStatuses = ['selesai', 'batal', 'arsip', 'ditolak'];
             if (!in_array($riwayat->status_verifikasi, $validStatuses)) {
                 throw new \Exception("Status {$riwayat->status_verifikasi} tidak valid untuk riwayat magang.");
             }
@@ -63,6 +63,11 @@ class RiwayatMagang extends Model
     public function scopeArsip($query)
     {
         return $query->where('status_verifikasi', 'arsip');
+    }
+    
+    public function scopeDitolak($query)
+    {
+        return $query->where('status_verifikasi', 'ditolak');
     }
 
     use HasFactory;
