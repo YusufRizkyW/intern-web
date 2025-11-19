@@ -143,22 +143,14 @@ class RiwayatMagangResource extends Resource
                 ])
                 ->columns(2),
 
-            // Catatan & sertifikat (masih bisa diubah admin)
-            Forms\Components\Section::make('Catatan & Sertifikat')
+            // Catatan (masih bisa diubah admin)
+            Forms\Components\Section::make('Catatan')
                 ->schema([
                     Forms\Components\Textarea::make('catatan_admin')
                         ->label('Catatan Admin')
                         ->rows(3)
                         ->helperText('Catatan ini akan terlihat oleh user')
                         ->columnSpanFull(),
-
-                    // Forms\Components\FileUpload::make('file_sertifikat')
-                    //     ->label('Sertifikat (PDF)')
-                    //     ->disk('public')
-                    //     ->directory('sertifikat_magang')
-                    //     ->acceptedFileTypes(['application/pdf'])
-                    //     ->downloadable()
-                    //     ->openable(),
                 ]),
         ]);
     }

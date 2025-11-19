@@ -54,7 +54,7 @@ class PendaftaranMagang extends Model
         }
 
         // Untuk tim: hitung ketua + anggota
-        return 1 + $this->members()->count();
+        return $this->members()->count();
     }
 
     /**
@@ -99,8 +99,11 @@ class PendaftaranMagang extends Model
             $statusLama = $pendaftaran->getOriginal('status_verifikasi');
             $statusBaru = $pendaftaran->status_verifikasi;
 
-            // Status yang MENGURANGI kuota (peserta diterima/aktif/selesai)
-            $statusTerpakai = ['diterima', 'aktif', 'selesai'];
+            // ✅ PERBAIKAN: Status yang masih AKTIF menggunakan kuota
+            $statusTerpakai = ['diterima', 'aktif']; // Hapus 'selesai'
+            
+            // Status yang sudah FINAL tidak menggunakan kuota lagi
+            $statusFinal = ['selesai', 'batal', 'arsip'];
             
             $wasUsingQuota = in_array($statusLama, $statusTerpakai);
             $willUseQuota = in_array($statusBaru, $statusTerpakai);
@@ -109,13 +112,14 @@ class PendaftaranMagang extends Model
             if (!$wasUsingQuota && $willUseQuota) {
                 $pendaftaran->updateKuotaMultiPeriode('add');
             }
-            
-            // Jika dari terpakai ke tidak-terpakai
+
+            // ✅ PERBAIKAN: Kembalikan kuota jika berubah ke status final
             if ($wasUsingQuota && !$willUseQuota) {
                 $pendaftaran->updateKuotaMultiPeriode('reduce');
             }
+            
 
-            // Log status changes
+            // Log perubahan status (tetap sama)
             if ($pendaftaran->isDirty('status_verifikasi')) {
                 \App\Models\PendaftaranStatusLog::create([
                     'pendaftaran_magang_id' => $pendaftaran->id,
@@ -123,6 +127,25 @@ class PendaftaranMagang extends Model
                     'status_lama' => $statusLama,
                     'status_baru' => $statusBaru,
                     'catatan' => $pendaftaran->catatan_admin,
+                ]);
+            }
+
+            // Pindahkan ke riwayat (tetap sama)
+            $statusRiwayat = ['selesai', 'batal', 'arsip'];
+            if (in_array($statusBaru, $statusRiwayat) && !in_array($statusLama, $statusRiwayat)) {
+                \App\Models\RiwayatMagang::create([
+                    'pendaftaran_magang_id' => $pendaftaran->id,
+                    'user_id' => $pendaftaran->user_id,
+                    'nama_lengkap' => $pendaftaran->nama_lengkap,
+                    'agency' => $pendaftaran->agency,
+                    'nim' => $pendaftaran->nim,
+                    'email' => $pendaftaran->email,
+                    'no_hp' => $pendaftaran->no_hp,
+                    'link_drive' => $pendaftaran->link_drive,
+                    'catatan_admin' => $pendaftaran->catatan_admin,
+                    'status_verifikasi' => $statusBaru,
+                    'tanggal_mulai' => $pendaftaran->tanggal_mulai,
+                    'tanggal_selesai' => $pendaftaran->tanggal_selesai,
                 ]);
             }
         });
@@ -219,5 +242,9 @@ class PendaftaranMagang extends Model
     {
         $this->updateKuotaMultiPeriode($action);
     }
+
+    
+
+    
 }
 

@@ -37,7 +37,31 @@ class KuotaMagangResource extends Resource
                                     return $years;
                                 })
                                 ->default(date('Y'))
-                                ->required(),
+                                ->required()
+                                ->reactive()
+                                ->afterStateUpdated(fn ($state, callable $set) => $set('_check_duplicate', time()))
+                                ->rules([
+                                    'required',
+                                    function () {
+                                        return function (string $attribute, $value, \Closure $fail) {
+                                            $tahun = $value;
+                                            $bulan = request()->input('data.bulan');
+                                            $currentId = request()->route('record'); // ID saat edit
+
+                                            if ($tahun && $bulan) {
+                                                $exists = KuotaMagang::where('tahun', $tahun)
+                                                    ->where('bulan', $bulan)
+                                                    ->when($currentId, fn($q) => $q->where('id', '!=', $currentId))
+                                                    ->exists();
+
+                                                if ($exists) {
+                                                    $namaBulan = KuotaMagang::getNamaBulan($bulan);
+                                                    $fail("Kuota untuk periode {$namaBulan} {$tahun} sudah ada!");
+                                                }
+                                            }
+                                        };
+                                    }
+                                ]),
 
                             Forms\Components\Select::make('bulan')
                                 ->label('Bulan')
@@ -48,7 +72,31 @@ class KuotaMagangResource extends Resource
                                     10 => 'Oktober', 11 => 'November', 12 => 'Desember',
                                 ])
                                 ->default(date('n'))
-                                ->required(),
+                                ->required()
+                                ->reactive()
+                                ->afterStateUpdated(fn ($state, callable $set) => $set('_check_duplicate', time()))
+                                ->rules([
+                                    'required',
+                                    function () {
+                                        return function (string $attribute, $value, \Closure $fail) {
+                                            $bulan = $value;
+                                            $tahun = request()->input('data.tahun');
+                                            $currentId = request()->route('record'); // ID saat edit
+
+                                            if ($tahun && $bulan) {
+                                                $exists = KuotaMagang::where('tahun', $tahun)
+                                                    ->where('bulan', $bulan)
+                                                    ->when($currentId, fn($q) => $q->where('id', '!=', $currentId))
+                                                    ->exists();
+
+                                                if ($exists) {
+                                                    $namaBulan = KuotaMagang::getNamaBulan($bulan);
+                                                    $fail("Kuota untuk periode {$namaBulan} {$tahun} sudah ada!");
+                                                }
+                                            }
+                                        };
+                                    }
+                                ]),
                         ]),
                 ]),
 
@@ -61,7 +109,20 @@ class KuotaMagangResource extends Resource
                                 ->numeric()
                                 ->minValue(1)
                                 ->required()
-                                ->helperText('Jumlah maksimal peserta magang untuk periode ini'),
+                                ->helperText('Jumlah maksimal peserta magang untuk periode ini')
+                                ->rules([
+                                    'required',
+                                    'numeric',
+                                    'min:1',
+                                    function () {
+                                        return function (string $attribute, $value, \Closure $fail) {
+                                            $kuotaTerisi = request()->input('data.kuota_terisi', 0);
+                                            if ($value < $kuotaTerisi) {
+                                                $fail("Kuota maksimal tidak boleh lebih kecil dari kuota terisi ({$kuotaTerisi} peserta)");
+                                            }
+                                        };
+                                    }
+                                ]),
 
                             Forms\Components\TextInput::make('kuota_terisi')
                                 ->label('Kuota Terisi')
@@ -81,6 +142,37 @@ class KuotaMagangResource extends Resource
                         ->rows(3)
                         ->columnSpanFull()
                         ->helperText('Catatan tambahan tentang kuota periode ini'),
+                ]),
+
+            Forms\Components\Hidden::make('_check_duplicate')
+                ->rules([
+                    function () {
+                        return function (string $attribute, $value, \Closure $fail) {
+                            $tahun = request()->input('data.tahun');
+                            $bulan = request()->input('data.bulan');
+                            $currentId = request()->route('record'); // ID saat edit
+
+                            if ($tahun && $bulan) {
+                                $exists = KuotaMagang::where('tahun', $tahun)
+                                    ->where('bulan', $bulan)
+                                    ->when($currentId, fn($q) => $q->where('id', '!=', $currentId))
+                                    ->exists();
+
+                                if ($exists) {
+                                    $namaBulan = KuotaMagang::getNamaBulan($bulan);
+                                    
+                                    Notification::make()
+                                        ->title('Gagal Menyimpan!')
+                                        ->body("Kuota untuk periode {$namaBulan} {$tahun} sudah ada. Silakan pilih periode yang berbeda.")
+                                        ->danger()
+                                        ->persistent()
+                                        ->send();
+
+                                    $fail("Kuota untuk periode {$namaBulan} {$tahun} sudah ada!");
+                                }
+                            }
+                        };
+                    }
                 ]),
         ]);
     }

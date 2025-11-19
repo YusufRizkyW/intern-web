@@ -106,4 +106,97 @@ class KuotaMagang extends Model
     {
         return $this->nama_bulan . ' ' . $this->tahun;
     }
+
+    /**
+     * Event listener untuk validasi duplikasi dan konsistensi data
+     */
+    protected static function booted(): void
+    {
+        static::saving(function ($model) {
+            // Validasi duplicate periode
+            $exists = self::where('tahun', $model->tahun)
+                ->where('bulan', $model->bulan)
+                ->where('id', '!=', $model->id ?? 0)
+                ->exists();
+
+            if ($exists) {
+                $namaBulan = self::getNamaBulan($model->bulan);
+                throw new \Exception("Kuota untuk periode {$namaBulan} {$model->tahun} sudah ada!");
+            }
+
+            // Validasi kuota_maksimal >= kuota_terisi
+            if ($model->kuota_maksimal < $model->kuota_terisi) {
+                throw new \Exception("Kuota maksimal ({$model->kuota_maksimal}) tidak boleh lebih kecil dari kuota terisi ({$model->kuota_terisi})");
+            }
+
+            // Pastikan kuota_terisi tidak negatif
+            if ($model->kuota_terisi < 0) {
+                $model->kuota_terisi = 0;
+            }
+        });
+    }
+
+    /**
+     * Auto-generate kuota untuk beberapa bulan ke depan
+     */
+    public static function generateKuotaRange($startYear, $startMonth, $totalMonths = 12, $defaultKuota = 50)
+    {
+        $created = [];
+
+        for ($i = 0; $i < $totalMonths; $i++) {
+            $month = $startMonth + $i;
+            $year = $startYear;
+
+            // Handle year overflow
+            while ($month > 12) {
+                $month -= 12;
+                $year++;
+            }
+
+            // Skip jika sudah ada
+            if (self::where('tahun', $year)->where('bulan', $month)->exists()) {
+                continue;
+            }
+
+            $kuota = self::create([
+                'tahun' => $year,
+                'bulan' => $month,
+                'kuota_maksimal' => $defaultKuota,
+                'kuota_terisi' => 0,
+                'is_active' => true,
+                'catatan' => 'Kuota otomatis untuk ' . self::getNamaBulan($month) . ' ' . $year,
+            ]);
+
+            $created[] = $kuota;
+        }
+
+        return $created;
+    }
+
+    /**
+     * Recalculate kuota terisi berdasarkan data pendaftaran aktual
+     */
+    public function recalculateKuotaTerisi(): void
+    {
+        $totalPeserta = 0;
+
+        // Ambil semua pendaftaran yang menggunakan kuota untuk periode ini
+        $pendaftarans = \App\Models\PendaftaranMagang::whereIn('status_verifikasi', ['diterima', 'aktif', 'selesai'])
+            ->get()
+            ->filter(function ($pendaftaran) {
+                $periodeMagang = $pendaftaran->periode_magang;
+                foreach ($periodeMagang as $periode) {
+                    if ($periode['tahun'] == $this->tahun && $periode['bulan'] == $this->bulan) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+        foreach ($pendaftarans as $pendaftaran) {
+            $totalPeserta += $pendaftaran->jumlah_peserta;
+        }
+
+        $this->update(['kuota_terisi' => $totalPeserta]);
+    }
 }
