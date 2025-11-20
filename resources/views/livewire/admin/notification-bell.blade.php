@@ -1,13 +1,12 @@
 {{-- filepath: resources/views/livewire/admin/notification-bell.blade.php --}}
-<div>
-    {{-- Main notification bell component --}}
-    <div class="relative" x-data="{ open: false }" x-init="$watch('open', value => console.log('Dropdown open:', value))">
-        {{-- Bell Icon --}}
-        <button 
-            @click="open = !open"
-            class="relative p-2 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full"
-            aria-label="Notifications"
-        >
+<div class="relative" x-data="{ open: false }">
+    {{-- Bell Icon --}}
+    <button 
+        @click="open = !open"
+        type="button"
+        class="relative p-2 text-gray-500 hover:text-gray-700 rounded-full"
+        aria-label="Notifications"
+    >
             {{-- Bell SVG --}}
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -22,20 +21,14 @@
             @endif
         </button>
 
-        {{-- Dropdown dengan animasi yang diperbaiki --}}
-        <div 
-            x-show="open"
-            x-cloak
-            @click.away="open = false"
-            @keydown.escape.window="open = false"
-            x-transition:enter="transition ease-out duration-300 transform"
-            x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
-            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-            x-transition:leave="transition ease-in duration-200 transform"
-            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-            x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
-            class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 origin-top-right"
-        >
+    {{-- Dropdown --}}
+    <div 
+        x-show="open"
+        x-cloak
+        @click.away="open = false"
+        @keydown.escape.window="open = false"
+        class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+    >
             {{-- Header --}}
             <div class="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
                 <div class="flex items-center justify-between">
@@ -64,8 +57,9 @@
 
             {{-- Notification List --}}
             <div class="max-h-96 overflow-y-auto notification-list">
-                @forelse($notifications as $notification)
-                    <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 {{ $notification['read_at'] ? 'opacity-75' : 'bg-blue-50/30' }}">
+                @forelse($notifications ?? [] as $notification)
+                    @if(is_array($notification) && isset($notification['id']))
+                    <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 {{ ($notification['read_at'] ?? null) ? 'opacity-75' : 'bg-blue-50/30' }}">
                         <div class="flex items-start gap-3">
                             {{-- Icon --}}
                             <div class="flex-shrink-0 mt-1">
@@ -86,25 +80,24 @@
 
                             {{-- Content --}}
                             <div class="flex-1 min-w-0">
-                                <div class="text-sm font-medium text-gray-800 {{ !$notification['read_at'] ? 'font-semibold' : '' }}">
-                                    {{ $notification['data']['title'] ?? 'Notifikasi' }}
+                                <div class="text-sm font-medium text-gray-800 {{ !($notification['read_at'] ?? null) ? 'font-semibold' : '' }}">
+                                    {{ $notification['data']['title'] ?? $notification['data']['message'] ?? 'Notifikasi' }}
                                 </div>
                                 <div class="text-xs text-gray-600 mt-1 notification-text-clamp">
-                                    {{ $notification['data']['body'] ?? 'Tidak ada deskripsi' }}
+                                    {{ $notification['data']['body'] ?? $notification['data']['message'] ?? 'Tidak ada deskripsi' }}
                                 </div>
                                 <div class="text-xs text-gray-500 mt-2 flex items-center gap-2">
                                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                                     </svg>
-                                    {{ $notification['created_at']->diffForHumans() }}
+                                    {{ $notification['created_at_human'] ?? 'Baru saja' }}
                                 </div>
                             </div>
 
                             {{-- Mark as read button --}}
-                            @if(!$notification['read_at'])
+                            @if(!($notification['read_at'] ?? null))
                                 <button 
-                                    wire:click="markAsRead('{{ $notification['id'] }}')"
-                                    @click="$wire.markAsRead('{{ $notification['id'] }}')"
+                                    wire:click="markAsRead('{{ $notification['id'] ?? '' }}')"
                                     class="flex-shrink-0 text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50 transition-colors duration-200"
                                     title="Tandai dibaca"
                                 >
@@ -121,6 +114,7 @@
                             @endif
                         </div>
                     </div>
+                    @endif
                 @empty
                     <div class="p-8 text-center text-gray-500">
                         <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,8 +137,6 @@
                 </div>
             @endif
         </div>
-    </div>
-
     {{-- Inline styles untuk komponen --}}
     <style>
         [x-cloak] { 
@@ -177,30 +169,13 @@
         }
     </style>
 
-    {{-- JavaScript untuk real-time updates --}}
+    {{-- Simple JavaScript polling --}}
     <script>
-        document.addEventListener('alpine:init', () => {
-            // Refresh notifications every 30 seconds dengan debounce
-            let refreshInterval;
-            
-            const refreshNotifications = () => {
-                if (typeof Livewire !== 'undefined' && @this) {
-                    @this.call('loadNotifications');
-                }
-            };
-            
-            // Set interval
-            refreshInterval = setInterval(refreshNotifications, 30000);
-            
-            // Cleanup on page unload
-            window.addEventListener('beforeunload', () => {
-                if (refreshInterval) {
-                    clearInterval(refreshInterval);
-                }
-            });
-            
-            // Debug log
-            console.log('Notification Bell initialized');
-        });
+        // Simple refresh every 2 minutes
+        setInterval(function() {
+            if (typeof Livewire !== 'undefined' && @this) {
+                @this.call('loadNotifications');
+            }
+        }, 120000);
     </script>
 </div>

@@ -137,6 +137,9 @@ class PendaftaranMagang extends Model
                     'status_baru' => $statusBaru,
                     'catatan' => $pendaftaran->catatan_admin,
                 ]);
+
+                // Clear notification cache dengan debouncing untuk efisiensi
+                \App\Services\CacheOptimizationService::clearAdminNotificationCacheDebounced();
             }
 
             // Pindahkan ke riwayat (tambah status ditolak)

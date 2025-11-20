@@ -20,8 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Register Livewire component
-        Livewire::component('admin.notification-bell', \App\Livewire\Admin\NotificationBell::class);
+        // // Register Livewire components
+        // Livewire::component('admin.notification-bell', \App\Livewire\Admin\NotificationBellSimple::class);
         
         // Register observer untuk auto-notification
         \App\Models\PendaftaranMagang::observe(\App\Observers\PendaftaranMagangObserver::class);

@@ -240,23 +240,30 @@ class PendaftaranMagangResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            // ✅ PERFORMANCE OPTIMIZATIONS
+            ->defaultPaginationPageOption(25) // Reduce dari 50 ke 25 untuk loading lebih cepat
+            ->defaultSort('created_at', 'desc') // Default sort
+            ->striped() // Striped table untuk readability
+            ->poll('60s'); // Auto refresh tiap 60 detik untuk mengurangi beban server
     }
 
     /**
      * Tampilkan semua pendaftaran untuk pengelolaan admin
+     * ✅ OPTIMIZED: Eager loading dan filter yang efisien
      */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with('user')
+            ->with(['user:id,name,email', 'members:id,pendaftaran_magang_id,nama_anggota,is_ketua'])
             ->whereIn('status_verifikasi', [
                 'pending',
                 'revisi',
                 // 'diterima',
                 // 'aktif',
                 // 'ditolak', 'selesai', 'batal', 'arsip' sudah pindah ke riwayat
-            ]);
+            ])
+            ->latest('created_at'); // Default sort untuk performa
     }
 
     public static function getRelations(): array

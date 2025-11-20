@@ -1,0 +1,77 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+/* ✅ PERFORMANCE CSS OPTIMIZATIONS */
+
+/* Reduce animations untuk perception yang lebih cepat */
+*, *::before, *::after {
+    transition-duration: 0.15s !important;
+}
+
+/* Optimize table rendering */
+.fi-ta-table {
+    will-change: scroll-position;
+}
+
+/* Faster form rendering */
+.fi-fo-component-ctn {
+    contain: layout;
+}
+
+/* Optimize sidebar */
+.fi-sidebar {
+    contain: layout style;
+}
+
+/* Optimize notification bell */
+.notification-bell-dropdown {
+    contain: layout style;
+    will-change: opacity, transform;
+}
+
+/* Reduce motion untuk better performance */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Custom scrollbar untuk performa */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Optimize badge rendering */
+.fi-badge {
+    contain: layout style;
+}
+
+/* Faster modal rendering */
+.fi-modal {
+    contain: layout;
+}
+
+/* Performance optimizations for large tables */
+.fi-ta-table tbody tr {
+    contain: layout;
+}
+
+/* Optimize icon rendering */
+.fi-icon {
+    contain: layout size;
+}

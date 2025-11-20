@@ -44,6 +44,10 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
+            // ✅ PERFORMANCE OPTIMIZATIONS
+            ->spa() // Enable SPA mode untuk navigasi lebih cepat
+            ->viteTheme('resources/css/filament/admin/theme.css') // Custom theme
+            ->favicon(asset('favicon.ico'))
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -56,10 +60,10 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 EnsureIsAdmin::class,
             ])
-            ->renderHook(
-                'panels::topbar.start',
-                fn () => view('filament.admin.notification-bell-hook')
-            )
+            // ->renderHook(
+            //     'panels::topbar.start',
+            //     fn () => view('filament.admin.notification-bell-hook')
+            // )
 
             ->authMiddleware([
                 Authenticate::class,
