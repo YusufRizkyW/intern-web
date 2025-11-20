@@ -13,8 +13,24 @@
 
                     {{-- flash --}}
                     @if (session('success'))
-                        <div class="mb-4 p-3 bg-green-100 text-green-700 rounded text-sm">
-                            {{ session('success') }}
+                        <div class="mb-4 p-3 bg-green-100 border border-green-200 text-green-700 rounded text-sm">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ session('success') }}
+                            </div>
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="mb-4 p-3 bg-red-100 border border-red-200 text-red-700 rounded text-sm">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                {{ session('error') }}
+                            </div>
                         </div>
                     @endif
 
@@ -278,19 +294,55 @@
                         @switch($pendaftaran->status_verifikasi)
                             @case('pending')
                                 <div class="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded">
-                                    <div>
+                                    <div class="flex-1">
                                         <p class="text-sm text-yellow-700 font-medium">
                                             Pendaftaran Anda sedang menunggu verifikasi admin.
                                         </p>
                                         <p class="text-xs text-yellow-600">
-                                            Anda masih bisa mengedit pendaftaran selama status masih pending.
+                                            Anda masih bisa mengedit atau membatalkan pendaftaran selama status masih pending.
                                         </p>
                                     </div>
-                                    <a href="{{ route('pendaftaran.edit', $pendaftaran->id) }}"
-                                       class="bg-yellow-600 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-yellow-700 transition">
-                                        Edit Pendaftaran
-                                    </a>
+                                    
+                                    {{-- Action buttons --}}
+                                    <div class="flex items-center gap-3">
+                                        {{-- Tombol Edit --}}
+                                        <a href="{{ route('pendaftaran.edit', $pendaftaran->id) }}"
+                                           class="bg-yellow-600 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-yellow-700 transition">
+                                            Edit Pendaftaran
+                                        </a>
+                                        
+                                        {{-- Tombol Batalkan --}}
+                                        <button type="button" 
+                                                onclick="confirmCancel()"
+                                                class="bg-red-600 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-red-700 transition">
+                                            Batalkan
+                                        </button>
+                                    </div>
                                 </div>
+
+                                {{-- Modal Konfirmasi Batalkan (Hidden form) --}}
+                                <form id="cancelForm" action="{{ route('pendaftaran.destroy', $pendaftaran->id) }}" method="POST" style="display: none;">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+
+                                {{-- JavaScript untuk konfirmasi --}}
+                                <script>
+                                    function confirmCancel() {
+                                        const confirmed = confirm(
+                                            `Apakah Anda yakin ingin membatalkan pendaftaran magang?\n\n` +
+                                            `Data yang akan dihapus:\n` +
+                                            `• Nama: {{ $pendaftaran->nama_lengkap }}\n` +
+                                            `• Instansi: {{ $pendaftaran->agency ?? '-' }}\n` +
+                                            `• Jenis: {{ ucfirst($pendaftaran->tipe_pendaftaran) }}\n\n` +
+                                            `⚠️ Peringatan: Data akan dihapus permanen dan tidak dapat dikembalikan!`
+                                        );
+                                        
+                                        if (confirmed) {
+                                            document.getElementById('cancelForm').submit();
+                                        }
+                                    }
+                                </script>
                                 @break
                                 
                             @case('revisi')

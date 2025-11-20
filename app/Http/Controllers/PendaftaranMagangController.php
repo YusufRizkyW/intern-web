@@ -278,4 +278,49 @@ class PendaftaranMagangController extends Controller
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Batalkan pendaftaran (hanya untuk status pending)
+     */
+    public function destroy(PendaftaranMagang $pendaftaran)
+    {
+        // Pastikan hanya user yang memiliki pendaftaran ini yang bisa membatalkan
+        if ($pendaftaran->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Hanya bisa dibatalkan jika status masih pending
+        if ($pendaftaran->status_verifikasi !== 'pending') {
+            return redirect()->route('pendaftaran.status')
+                ->with('error', 'Pendaftaran tidak dapat dibatalkan karena sudah diproses admin.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Hapus data members jika ada (untuk tipe tim)
+            if ($pendaftaran->tipe_pendaftaran === 'tim') {
+                $pendaftaran->members()->delete();
+            }
+
+            // Simpan info untuk flash message
+            $nama = $pendaftaran->nama_lengkap;
+            $agency = $pendaftaran->agency;
+
+            // Hapus pendaftaran utama
+            $pendaftaran->delete();
+
+            DB::commit();
+
+            return redirect()->route('pendaftaran.status')
+                ->with('success', "Pendaftaran magang atas nama {$nama} dari {$agency} berhasil dibatalkan dan dihapus dari sistem.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error membatalkan pendaftaran: ' . $e->getMessage());
+            
+            return redirect()->route('pendaftaran.status')
+                ->with('error', 'Terjadi kesalahan saat membatalkan pendaftaran. Silakan coba lagi atau hubungi admin.');
+        }
+    }
 }

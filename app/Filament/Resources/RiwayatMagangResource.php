@@ -237,7 +237,7 @@ class RiwayatMagangResource extends Resource
     {
         return [
             'index' => Pages\ListRiwayatMagangs::route('/'),
-            'create' => Pages\CreateRiwayatMagang::route('/create'),
+            // 'create' => Pages\CreateRiwayatMagang::route('/create'),
             'edit' => Pages\EditRiwayatMagang::route('/{record}/edit'),
         ];
     }
