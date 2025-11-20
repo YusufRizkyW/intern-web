@@ -22,6 +22,7 @@ class DashboardController extends Controller
                 'pending', 'revisi', 'diterima', 'aktif',
             ])->count(),
             'selesai' => PendaftaranMagang::where('status_verifikasi', 'selesai')->count(),
+            'pendaftar' => PendaftaranMagang::where('status_verifikasi', 'pending')->count(),
         ];
 
         // ---------- Pendaftaran terbaru user (kalau login) ----------

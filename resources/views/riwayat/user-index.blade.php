@@ -31,7 +31,7 @@
                             </svg>
                             <p class="text-sm font-medium">Belum ada riwayat magang.</p>
                             <p class="text-xs text-gray-500">
-                                Data akan muncul di sini setelah periode magang kamu selesai dan diarsipkan oleh admin.
+                                Riwayat pendaftaran akan muncul di sini setelah periode magang kamu selesai atau dibatalkan.
                             </p>
                         </div>
                     @else
