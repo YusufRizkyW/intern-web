@@ -201,6 +201,27 @@ class RiwayatMagangResource extends Resource
                     ->label('Selesai'),
 
             ])
+
+            ->filters([
+                Tables\Filters\SelectFilter::make('status_verifikasi')
+                    ->label('Status')
+                    ->options([
+                        // 'pending'  => 'Pending',
+                        // 'revisi'   => 'Revisi',
+                        // 'diterima' => 'Diterima',
+                        'ditolak'  => 'Ditolak',
+                        // 'aktif'    => 'Aktif',
+                        'selesai'  => 'Selesai',
+                        'batal'    => 'Batal',
+                        'arsip'    => 'Arsip',
+                    ]),
+                Tables\Filters\SelectFilter::make('tipe_pendaftaran')
+                    ->label('Tipe')
+                    ->options([
+                        'individu' => 'Individu',
+                        'tim'      => 'Tim',
+                    ]),
+            ])
             
             ->actions([
                 Tables\Actions\ViewAction::make(),

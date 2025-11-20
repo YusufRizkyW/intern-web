@@ -172,6 +172,7 @@ class MagangAktifResource extends Resource
                         'info'    => 'revisi',
                         'success' => 'diterima',
                         'danger'  => 'ditolak',
+                        'success' => 'aktif',
                     ])
                     ->sortable(),
 
@@ -194,6 +195,7 @@ class MagangAktifResource extends Resource
                         'revisi'   => 'Revisi',
                         'diterima' => 'Diterima',
                         'ditolak'  => 'Ditolak',
+                        'aktif'    => 'Aktif',
                     ]),
                 Tables\Filters\SelectFilter::make('tipe_pendaftaran')
                     ->label('Tipe')

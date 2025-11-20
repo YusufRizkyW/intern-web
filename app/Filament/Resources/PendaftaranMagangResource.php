@@ -238,84 +238,6 @@ class PendaftaranMagangResource extends Resource
                         'tim'      => 'Tim',
                     ]),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                
-                Tables\Actions\Action::make('approve')
-                    ->label('Setujui')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->visible(fn (PendaftaranMagang $record): bool => $record->status_verifikasi === 'pending')
-                    ->requiresConfirmation()
-                    ->modalHeading('Setujui Pendaftaran')
-                    ->modalDescription(function (PendaftaranMagang $record) {
-                        $validation = $record->canBeApprovedDetailed();
-                        return $validation['message'];
-                    })
-                    ->modalSubmitActionLabel('Ya, Setujui')
-                    ->action(function (PendaftaranMagang $record) {
-                        $validation = $record->canBeApprovedDetailed();
-                        
-                        if (!$validation['can_approve']) {
-                            Notification::make()
-                                ->title('Gagal Menyetujui!')
-                                ->body($validation['message'])
-                                ->danger()
-                                ->send();
-                            return;
-                        }
-                        
-                        $record->update(['status_verifikasi' => 'diterima']);
-                        
-                        Notification::make()
-                            ->title('Berhasil!')
-                            ->body('Pendaftaran berhasil disetujui')
-                            ->success()
-                            ->send();
-                    }),
-
-                Tables\Actions\Action::make('reject')
-                    ->label('Tolak')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->visible(fn (PendaftaranMagang $record): bool => in_array($record->status_verifikasi, ['pending', 'diterima']))
-                    ->requiresConfirmation()
-                    ->modalHeading('Tolak Pendaftaran')
-                    ->modalDescription('Apakah Anda yakin ingin menolak pendaftaran ini?')
-                    ->modalSubmitActionLabel('Ya, Tolak')
-                    ->action(function (PendaftaranMagang $record) {
-                        $record->update(['status_verifikasi' => 'ditolak']);
-                        
-                        Notification::make()
-                            ->title('Berhasil!')
-                            ->body('Pendaftaran berhasil ditolak')
-                            ->success()
-                            ->send();
-                    }),
-                    
-                Tables\Actions\EditAction::make()
-                    ->mutateFormDataUsing(function (array $data, $record): array {
-                        // Jika status diubah ke 'diterima', validasi kuota
-                        if ($data['status_verifikasi'] === 'diterima' && 
-                            $record->status_verifikasi !== 'diterima') {
-                            
-                            $validation = $record->canBeApprovedDetailed();
-                            
-                            if (!$validation['can_approve']) {
-                                Notification::make()
-                                    ->title('Kuota Tidak Cukup!')
-                                    ->body($validation['message'])
-                                    ->danger()
-                                    ->send();
-                                
-                                // Reset status ke semula
-                                $data['status_verifikasi'] = $record->status_verifikasi;
-                            }
-                        }
-                        
-                        return $data;
-                    }),
-            ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
@@ -331,8 +253,8 @@ class PendaftaranMagangResource extends Resource
             ->whereIn('status_verifikasi', [
                 'pending',
                 'revisi',
-                'diterima',
-                'aktif',
+                // 'diterima',
+                // 'aktif',
                 // 'ditolak', 'selesai', 'batal', 'arsip' sudah pindah ke riwayat
             ]);
     }

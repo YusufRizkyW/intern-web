@@ -50,6 +50,7 @@ class StatusLogsRelationManager extends RelationManager
                         'revisi' => 'info',
                         'diterima' => 'success',
                         'ditolak' => 'danger',
+                        'aktif' => 'success',
                         default => 'gray',
                     })
                     ->placeholder('(Status Awal)'),
@@ -62,6 +63,7 @@ class StatusLogsRelationManager extends RelationManager
                         'revisi' => 'info',
                         'diterima' => 'success',
                         'ditolak' => 'danger',
+                        'aktif' => 'success',
                         default => 'gray',
                     }),
                     
