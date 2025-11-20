@@ -56,6 +56,11 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 EnsureIsAdmin::class,
             ])
+            ->renderHook(
+                'panels::topbar.start',
+                fn () => view('filament.admin.notification-bell-hook')
+            )
+
             ->authMiddleware([
                 Authenticate::class,
             ]);
