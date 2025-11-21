@@ -68,6 +68,17 @@
                             </div>
                         </div>
 
+                         {{-- NEW: agency tunggal (dipindah di sini) --}}
+                        <div class="mt-2">
+                            <label class="block text-sm text-gray-700">Asal / Instansi / Kampus <span class="text-red-500">*</span></label>
+                            <input type="text" name="agency"
+                                value="{{ old('agency', $pendaftaran->agency) }}"
+                                class="w-full border rounded p-2 text-sm"
+                                placeholder="Contoh: Universitas X / SMK Y"
+                                required>
+
+                        </div>
+
                         {{-- 2. Data individu --}}
                         <div id="form_individu" class="{{ old('tipe_pendaftaran', $pendaftaran->tipe_pendaftaran) === 'individu' ? '' : 'hidden' }}">
                             <h3 class="text-sm font-semibold text-gray-700 mb-3">Data Pendaftar</h3>
@@ -96,12 +107,12 @@
                                            value="{{ old('no_hp', $pendaftaran->no_hp) }}"
                                            class="w-full border rounded p-2 text-sm">
                                 </div>
-                                <div class="md:col-span-2">
+                                {{-- <div class="md:col-span-2">
                                     <label class="block text-xs text-gray-700 mb-1">Instansi / Asal</label>
                                     <input type="text" name="agency" 
                                            value="{{ old('agency', $pendaftaran->agency) }}"
                                            class="w-full border rounded p-2 text-sm">
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
 
@@ -115,12 +126,12 @@
                                 </button>
                             </div>
                             
-                            <div class="md:col-span-2 mb-4">
+                            {{-- <div class="md:col-span-2 mb-4">
                                 <label class="block text-xs text-gray-700 mb-1">Instansi / Asal</label>
                                 <input type="text" name="agency" 
                                        value="{{ old('agency', $pendaftaran->agency) }}"
                                        class="w-full border rounded p-2 text-sm">
-                            </div>
+                            </div> --}}
 
                             <div id="anggota_list" class="space-y-3">
                                 @php
