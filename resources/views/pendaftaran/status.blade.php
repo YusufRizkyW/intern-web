@@ -346,18 +346,29 @@
                                 @break
                                 
                             @case('revisi')
-                                <div class="p-4 bg-blue-50 border border-blue-200 rounded">
-                                    <p class="text-sm text-blue-700 font-medium mb-2">
-                                        Beberapa data atau dokumen perlu direvisi.
-                                    </p>
-                                    <p class="text-xs text-blue-600 mb-3">
-                                        Silakan cek catatan admin di atas dan perbaiki sesuai petunjuk.
-                                    </p>
-                                    <p class="text-xs text-blue-500">
-                                        <strong>Catatan:</strong>  
-                                        Silakan dicek kembali link Google Drive yang sudah Anda kirim,
-                                        pastikan dokumen sudah lengkap dan bisa diakses oleh admin.
-                                    </p>
+                                <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded">
+                                    <div class="flex-1">
+                                        <p class="text-sm text-blue-700 font-medium mb-2">
+                                            Beberapa data atau dokumen perlu direvisi.
+                                        </p>
+                                        <p class="text-xs text-blue-600 mb-2">
+                                            Silakan cek catatan admin di atas dan perbaiki sesuai petunjuk.
+                                        </p>
+                                        <p class="text-xs text-blue-500">
+                                            <strong>Catatan:</strong>  
+                                            Silakan dicek kembali link Google Drive yang sudah Anda kirim,
+                                            pastikan dokumen sudah lengkap dan bisa diakses oleh admin.
+                                        </p>
+                                    </div>
+                                    
+                                    {{-- Action button --}}
+                                    <div class="flex items-center">
+                                        {{-- Tombol Edit --}}
+                                        <a href="{{ route('pendaftaran.edit', $pendaftaran->id) }}"
+                                           class="bg-blue-600 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-blue-700 transition">
+                                            Edit Pendaftaran
+                                        </a>
+                                    </div>
                                 </div>
                                 @break
                                 
