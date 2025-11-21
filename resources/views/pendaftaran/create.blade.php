@@ -61,6 +61,17 @@
                             </p>
                         </div>
 
+                        {{-- NEW: agency tunggal (dipindah di sini) --}}
+                        <div class="mt-2">
+                            <label class="block text-sm text-gray-700">Asal / Instansi / Kampus <span class="text-red-500">*</span></label>
+                            <input type="text" name="agency"
+                                value="{{ old('agency') }}"
+                                class="w-full border rounded p-2 text-sm"
+                                placeholder="Contoh: Universitas X / SMK Y"
+                                required>
+                        </div>
+
+
                         {{-- 2A. Data peserta (INDIVIDU) --}}
                         <div id="form_individu" class="{{ old('tipe_pendaftaran','individu') === 'individu' ? '' : 'hidden' }} space-y-4 border rounded p-4 mt-2">
                             <h3 class="text-sm font-semibold text-gray-700">Data Peserta</h3>
@@ -71,12 +82,12 @@
                                     value="{{ old('nama_lengkap') }}"
                                     class="w-full border rounded p-2 text-sm">
                             </div>
-                            <div>
+                            {{-- <div>
                                 <label class="block text-sm text-gray-700">Asal / Instansi / Kampus <span class="text-red-500">*</span></label>
                                 <input type="text" name="agency"
                                     value="{{ old('agency') }}"
                                     class="w-full border rounded p-2 text-sm">
-                            </div>
+                            </div> --}}
                             <div>
                                 <label class="block text-sm text-gray-700">NIM / NIS <span class="text-red-500">*</span></label>
                                 <input type="text" name="nim"
@@ -103,12 +114,12 @@
                             <h3 class="text-sm font-semibold text-gray-700">Daftar Peserta (Tim)</h3>
 
                             {{-- agency untuk seluruh tim --}}
-                            <div>
+                            {{-- <div>
                                 <label class="block text-sm text-gray-700">Asal / Instansi / Kampus <span class="text-red-500">*</span></label>
                                 <input type="text" name="agency"
                                     value="{{ old('agency') }}"
                                     class="w-full border rounded p-2 text-sm">
-                            </div>
+                            </div> --}}
 
                             <p class="text-xs text-gray-500 mb-2">
                                 Peserta 1 akan dianggap ketua / kontak utama.

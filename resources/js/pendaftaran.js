@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Fix: Gunakan selector untuk radio buttons, bukan getElementById
-    const radioIndividu = document.getElementById('tipe_pendaftaran_individu');
-    const radioTim = document.getElementById('tipe_pendaftaran_tim');
+    // support both select (create) and radio (edit)
+    const tipeSelect = document.getElementById('tipe_pendaftaran');
+    const tipeRadios = Array.from(document.querySelectorAll('input[name="tipe_pendaftaran"][type="radio"]'));
     const formIndividu = document.getElementById('form_individu');
     const formTim = document.getElementById('form_tim');
     const anggotaList = document.getElementById('anggota_list');
@@ -14,34 +14,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let count = typeof initialCount !== 'undefined' ? initialCount : 1;
 
+    function getTipeValue() {
+        if (tipeSelect) return tipeSelect.value;
+        const checked = tipeRadios.find(r => r.checked);
+        return checked ? checked.value : 'individu';
+    }
+
+    function onTipeChange(fn) {
+        if (tipeSelect) {
+            tipeSelect.addEventListener('change', fn);
+        }
+        if (tipeRadios.length) {
+            tipeRadios.forEach(r => r.addEventListener('change', fn));
+        }
+    }
+
     function setDisabled(container, disabled) {
+        if (!container) return;
         container.querySelectorAll('input, select, textarea').forEach(el => {
             el.disabled = disabled;
         });
     }
 
     function toggleTipe() {
-        if (radioTim && radioTim.checked) {
-            formTim.classList.remove('hidden');
-            setDisabled(formTim, false);
+        const tipe = getTipeValue();
 
-            formIndividu.classList.add('hidden');
-            setDisabled(formIndividu, true);
+        if (tipe === 'tim') {
+            if (formTim) {
+                formTim.classList.remove('hidden');
+                setDisabled(formTim, false);
+            }
+            if (formIndividu) {
+                formIndividu.classList.add('hidden');
+                setDisabled(formIndividu, true);
+            }
         } else {
-            formIndividu.classList.remove('hidden');
-            setDisabled(formIndividu, false);
-
-            formTim.classList.add('hidden');
-            setDisabled(formTim, true);
+            if (formIndividu) {
+                formIndividu.classList.remove('hidden');
+                setDisabled(formIndividu, false);
+            }
+            if (formTim) {
+                formTim.classList.add('hidden');
+                setDisabled(formTim, true);
+            }
         }
     }
 
-    if (radioIndividu && radioTim) {
-        radioIndividu.addEventListener('change', toggleTipe);
-        radioTim.addEventListener('change', toggleTipe);
-        toggleTipe(); // Initial call
-    }
+    // Bind change on whichever control exists
+    onTipeChange(toggleTipe);
 
+    // initial toggle on load
+    toggleTipe();
+
+    // anggota dynamic
     if (addBtn && anggotaList) {
         addBtn.addEventListener('click', () => {
             anggotaList.insertAdjacentHTML('beforeend', `
@@ -70,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // periode toggle
     if (radioDurasi && radioTanggal) {
         radioDurasi.addEventListener('change', () => {
             durasiWrap.style.display = '';
@@ -81,15 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Debug: Pastikan form submit tidak diblok
+    // debug listener for submit (optional)
     const form = document.querySelector('form[method="POST"]');
     if (form) {
-        console.log('Form found:', form);
         form.addEventListener('submit', function(e) {
-            console.log('Form submit triggered!', e);
-            console.log('Form action:', form.action);
-            console.log('Form method:', form.method);
-            // JANGAN preventDefault() - biarkan form submit normal
+            console.log('Submitting form. tipe_pendaftaran =', getTipeValue());
+            const agency = document.querySelector('input[name="agency"]');
+            console.log('Agency present:', !!agency, agency ? agency.value : null);
         });
     }
 });
