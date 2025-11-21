@@ -354,8 +354,9 @@
                                         Silakan cek catatan admin di atas dan perbaiki sesuai petunjuk.
                                     </p>
                                     <p class="text-xs text-blue-500">
-                                        <strong>Catatan:</strong> Saat status revisi, Anda tidak dapat mengedit form. 
-                                        Silakan perbaiki dokumen di Google Drive dan hubungi admin.
+                                        <strong>Catatan:</strong>  
+                                        Silakan dicek kembali link Google Drive yang sudah Anda kirim,
+                                        pastikan dokumen sudah lengkap dan bisa diakses oleh admin.
                                     </p>
                                 </div>
                                 @break
@@ -377,46 +378,7 @@
                                         🚀 Anda sedang menjalani periode magang.
                                     </p>
                                     <p class="text-xs text-green-600">
-                                        Pastikan link Google Drive tetap bisa diakses untuk monitoring progress.
-                                    </p>
-                                </div>
-                                @break
-                                
-                            @case('ditolak')
-                                <div class="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded">
-                                    <div>
-                                        <p class="text-sm text-red-700 font-medium">
-                                            Pendaftaran Anda ditolak.
-                                        </p>
-                                        <p class="text-xs text-red-600">
-                                            Silakan hubungi admin untuk informasi lebih lanjut atau ajukan pendaftaran baru.
-                                        </p>
-                                    </div>
-                                    <a href="{{ route('pendaftaran.create') }}"
-                                       class="bg-red-600 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-red-700 transition">
-                                        Ajukan Ulang
-                                    </a>
-                                </div>
-                                @break
-                                
-                            @case('diterima')
-                                <div class="p-4 bg-green-50 border border-green-200 rounded">
-                                    <p class="text-sm text-green-700 font-medium">
-                                        🎉 Selamat! Pendaftaran Anda sudah diterima.
-                                    </p>
-                                    <p class="text-xs text-green-600">
-                                        Silakan menunggu informasi teknis lebih lanjut dari admin.
-                                    </p>
-                                </div>
-                                @break
-                                
-                            @case('aktif')
-                                <div class="p-4 bg-green-50 border border-green-200 rounded">
-                                    <p class="text-sm text-green-700 font-medium">
-                                        🚀 Anda sedang menjalani periode magang.
-                                    </p>
-                                    <p class="text-xs text-green-600">
-                                        Pastikan link Google Drive tetap bisa diakses untuk monitoring progress.
+                                        Pastikan link Google Drive tetap bisa diakses.
                                     </p>
                                 </div>
                                 @break

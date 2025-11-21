@@ -45,7 +45,7 @@
                         </h1>
                         <p class="text-sm text-gray-600">
                             Di sini kamu bisa mengajukan pendaftaran magang, memantau status pendaftaran,
-                            dan melihat riwayat magang yang sudah selesai.
+                            dan melihat riwayat pendaftaran anda.
                         </p>
 
                         @guest
@@ -69,12 +69,12 @@
                             <div class="flex flex-wrap gap-2 justify-start md:justify-end">
                                 <a href="{{ route('login') }}"
                                    class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded border border-gray-300 text-gray-700 hover:bg-gray-50">
-                                    Login
+                                    {{ __('Masuk') }}
                                 </a>
                                 @if (Route::has('register'))
                                     <a href="{{ route('register') }}"
                                        class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded bg-red-600 text-white hover:bg-red-700">
-                                        Registrasi
+                                        {{ __('Registrasi') }}
                                     </a>
                                 @endif
                             </div>
@@ -122,7 +122,7 @@
                             Ajukan Pendaftaran Magang
                         </h3>
                         <p class="text-xs text-gray-600">
-                            Isi formulir pendaftaran untuk magang secara individu maupun tim/rombongan.
+                            Isi formulir pendaftaran untuk magang secara individu maupun tim.
                         </p>
                     </div>
 
@@ -142,7 +142,7 @@
                         </h3>
                         <p class="text-xs text-gray-600">
                             Lihat apakah pendaftaran kamu masih pending, perlu revisi, sudah diterima,
-                            atau sudah aktif / selesai.
+                            atau sudah aktif.
                         </p>
                     </div>
 
