@@ -14,7 +14,7 @@
 
         <!-- Password -->
         <div class="mt-4 relative">
-            <x-input-label for="password" :value="__('Password')" />
+            <x-input-label for="password" :value="__('Sandi')" />
             <x-text-input id="password" class="block mt-1 w-full pr-10" type="password" name="password" required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
             <button type="button" onclick="togglePassword('password', 'eye-icon-password')" class="absolute inset-y-0 right-0 flex items-center px-2">
@@ -27,7 +27,7 @@
 
         <!-- Confirm Password -->
         <div class="mt-4 relative">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+            <x-input-label for="password_confirmation" :value="__('Konfirmasi Sandi')" />
             <x-text-input id="password_confirmation" class="block mt-1 w-full pr-10" type="password" name="password_confirmation" required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
             <button type="button" onclick="togglePassword('password_confirmation', 'eye-icon-confirmation')" class="absolute inset-y-0 right-0 flex items-center px-2">
@@ -40,7 +40,7 @@
 
         <div class="flex items-center justify-end mt-4">
             <x-primary-button>
-                {{ __('Reset Password') }}
+                {{ __('Reset Sandi') }}
             </x-primary-button>
         </div>
     </form>
