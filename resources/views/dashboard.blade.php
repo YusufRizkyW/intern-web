@@ -85,7 +85,8 @@
 
             {{-- SECTION 1.25: KALENDER --}}
             {{-- masukkan partial --}}
-            @include('dashboard._calendar')
+            @include('dashboard._calendar') 
+            {{-- END kalender --}}
 
             {{-- SECTION 1.5: STATISTIK SINGKAT --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -294,7 +295,7 @@
                         <div>
                             <div class="font-semibold">Tunggu Verifikasi Admin</div>
                             <div class="text-[11px] text-gray-500">
-                                Pantau status pendaftaran di menu "Status Pendaftaran".
+                                Pantau secara berkala status pendaftaran di menu "Status Pendaftaran".
                             </div>
                         </div>
                     </li>

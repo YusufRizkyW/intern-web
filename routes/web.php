@@ -71,14 +71,4 @@ Route::middleware('auth')->group(function () {
 // });
 
 
-
-Route::get('/test-email', function () {
-    Mail::raw('Email testing dari Brevo lokal!', function ($m) {
-        $m->to('emailmu@gmail.com')->subject('Test Brevo SMTP');
-    });
-
-    return 'Email dikirim!';
-});
-
-
 require __DIR__.'/auth.php';
