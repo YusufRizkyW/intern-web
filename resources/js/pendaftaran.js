@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const tipe = document.getElementById('tipe_pendaftaran');
+    // Fix: Gunakan selector untuk radio buttons, bukan getElementById
+    const radioIndividu = document.getElementById('tipe_pendaftaran_individu');
+    const radioTim = document.getElementById('tipe_pendaftaran_tim');
     const formIndividu = document.getElementById('form_individu');
     const formTim = document.getElementById('form_tim');
     const anggotaList = document.getElementById('anggota_list');
@@ -18,25 +20,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (tipe) {
-        function toggleTipe() {
-            if (tipe.value === 'tim') {
-                formTim.classList.remove('hidden');
-                setDisabled(formTim, false);
+    function toggleTipe() {
+        if (radioTim && radioTim.checked) {
+            formTim.classList.remove('hidden');
+            setDisabled(formTim, false);
 
-                formIndividu.classList.add('hidden');
-                setDisabled(formIndividu, true);
-            } else {
-                formIndividu.classList.remove('hidden');
-                setDisabled(formIndividu, false);
+            formIndividu.classList.add('hidden');
+            setDisabled(formIndividu, true);
+        } else {
+            formIndividu.classList.remove('hidden');
+            setDisabled(formIndividu, false);
 
-                formTim.classList.add('hidden');
-                setDisabled(formTim, true);
-            }
+            formTim.classList.add('hidden');
+            setDisabled(formTim, true);
         }
+    }
 
-        tipe.addEventListener('change', toggleTipe);
-        toggleTipe();
+    if (radioIndividu && radioTim) {
+        radioIndividu.addEventListener('change', toggleTipe);
+        radioTim.addEventListener('change', toggleTipe);
+        toggleTipe(); // Initial call
     }
 
     if (addBtn && anggotaList) {
@@ -75,6 +78,18 @@ document.addEventListener('DOMContentLoaded', () => {
         radioTanggal.addEventListener('change', () => {
             durasiWrap.style.display = 'none';
             tanggalWrap.style.display = '';
+        });
+    }
+
+    // Debug: Pastikan form submit tidak diblok
+    const form = document.querySelector('form[method="POST"]');
+    if (form) {
+        console.log('Form found:', form);
+        form.addEventListener('submit', function(e) {
+            console.log('Form submit triggered!', e);
+            console.log('Form action:', form.action);
+            console.log('Form method:', form.method);
+            // JANGAN preventDefault() - biarkan form submit normal
         });
     }
 });
