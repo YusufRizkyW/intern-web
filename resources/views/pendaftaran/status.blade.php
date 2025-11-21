@@ -271,13 +271,6 @@
                             @else
                                 <p class="text-xs text-gray-400">Belum ada link drive.</p>
                             @endif
-
-                            @if ($pendaftaran->status_verifikasi === 'revisi')
-                                <div class="mt-3 p-3 bg-blue-50 text-blue-700 text-xs rounded">
-                                    Dokumen Anda perlu diperbaiki. Silakan perbarui berkas di folder
-                                    Google Drive yang sudah Anda kirim, lalu pastikan link tetap bisa diakses.
-                                </div>
-                            @endif
                         </div>
 
                         {{-- Catatan Admin --}}
@@ -354,10 +347,8 @@
                                         <p class="text-xs text-blue-600 mb-2">
                                             Silakan cek catatan admin di atas dan perbaiki sesuai petunjuk.
                                         </p>
-                                        <p class="text-xs text-blue-500">
-                                            <strong>Catatan:</strong>  
-                                            Silakan dicek kembali link Google Drive yang sudah Anda kirim,
-                                            pastikan dokumen sudah lengkap dan bisa diakses oleh admin.
+                                        <p class="text-xs text-blue-600">
+                                            Setelah diperbarui, pendaftaran Anda akan direview ulang oleh admin.
                                         </p>
                                     </div>
                                     
