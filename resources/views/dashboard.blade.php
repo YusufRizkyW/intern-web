@@ -5,6 +5,7 @@
             'total_pendaftar' => 0,
             'sedang_diproses' => 0,
             'selesai' => 0,
+            'pendaftar' => 0,
         ];
 
         $pendaftaranTerbaru = $pendaftaranTerbaru ?? null;
@@ -91,7 +92,7 @@
                 <div class="bg-white shadow-sm rounded-lg p-4">
                     <p class="text-[11px] uppercase tracking-wide text-gray-500">Total Pendaftar</p>
                     <p class="mt-2 text-2xl font-bold text-gray-800">
-                        {{ $stats['total_pendaftar'] ?? 0 }}
+                        {{ $stats['pendaftar'] ?? 0 }}
                     </p>
                 </div>
 
@@ -173,7 +174,7 @@
             </div>
 
             {{-- SECTION 2.5: RINGKASAN PENDAFTARAN TERBARU USER --}}
-            <div class="bg-white shadow-sm rounded-lg p-6">
+            {{-- <div class="bg-white shadow-sm rounded-lg p-6">
                 @auth
                     <h3 class="text-sm font-semibold text-gray-800 mb-3">
                         Ringkasan Pendaftaran Terbaru Saya
@@ -193,12 +194,7 @@
                         @endphp
 
                         <div class="text-xs text-gray-700 space-y-1">
-                            <p>
-                                Instansi:
-                                <span class="font-semibold">
-                                    {{ $pendaftaranTerbaru->instansi->nama ?? '-' }}
-                                </span>
-                            </p>
+                            
                             <p>
                                 Periode:
                                 <span class="font-semibold">
@@ -209,8 +205,8 @@
                             </p>
                             <p class="flex items-center gap-2">
                                 Status:
-                                <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-semibold {{ $badgeClass }}">
-                                    {{ strtoupper($status) }}
+                                <span class="px-2 py-1 rounded text-[11px] font-semibold {{ $badgeClass }}">
+                                    {{ ucfirst($status) }}
                                 </span>
                             </p>
                             <p class="text-[11px] text-gray-500">
@@ -249,7 +245,7 @@
                         Login untuk melihat status
                     </a>
                 @endauth
-            </div>
+            </div> --}}
 
             {{-- SECTION 3: ALUR SINGKAT --}}
             <div class="bg-white shadow-sm rounded-lg p-6 md:p-8">
@@ -311,8 +307,8 @@
                     Informasi Penting
                 </h3>
                 <ul class="list-disc pl-5 text-xs text-gray-600 space-y-1">
-                    <li>Pastikan link Google Drive dapat diakses tanpa login (Anyone with the link).</li>
-                    <li>Gunakan email yang aktif karena update pendaftaran akan dikirim ke email tersebut.</li>
+                    <li>Pastikan link Google Drive dapat diakses secara publik.</li>
+                    <li>Cek status pendaftaran secara berkala.</li>
                     <li>Jika ada kendala, hubungi admin melalui email resmi (isi sesuai instansi kamu).</li>
                 </ul>
             </div>

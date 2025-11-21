@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Riwayat Magang Saya') }}
+            {{ __('Riwayat Saya') }}
         </h2>
     </x-slot>
 
@@ -31,7 +31,7 @@
                             </svg>
                             <p class="text-sm font-medium">Belum ada riwayat magang.</p>
                             <p class="text-xs text-gray-500">
-                                Data akan muncul di sini setelah periode magang kamu selesai dan diarsipkan oleh admin.
+                                Riwayat pendaftaran akan muncul di sini setelah periode magang kamu selesai atau dibatalkan.
                             </p>
                         </div>
                     @else
@@ -42,9 +42,9 @@
                                     <tr>
                                         <th class="px-4 py-2 border-b">Instansi / Asal</th>
                                         <th class="px-4 py-2 border-b">Periode</th>
+                                        <th class="px-4 py-2 border-b">Status</th>
                                         <th class="px-4 py-2 border-b">Peserta / Tim</th>
                                         <th class="px-4 py-2 border-b">Catatan Admin</th>
-                                        <th class="px-4 py-2 border-b text-center">Sertifikat</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y">
@@ -53,6 +53,23 @@
                                             $pendaftaran = $item->pendaftaranMagang ?? null;
                                             $isTim = $pendaftaran?->tipe_pendaftaran === 'tim';
                                             $anggota = $pendaftaran?->members ?? collect();
+                                            
+                                            // Status styling
+                                            $statusClass = match($item->status_verifikasi) {
+                                                'selesai' => 'bg-green-100 text-green-800',
+                                                'batal' => 'bg-red-100 text-red-800',
+                                                'ditolak' => 'bg-red-100 text-red-800',
+                                                'arsip' => 'bg-gray-100 text-gray-800',
+                                                default => 'bg-blue-100 text-blue-800'
+                                            };
+                                            
+                                            $statusText = match($item->status_verifikasi) {
+                                                'selesai' => 'Selesai',
+                                                'batal' => 'Dibatalkan',
+                                                'ditolak' => 'Ditolak',
+                                                'arsip' => 'Diarsipkan',
+                                                default => ucfirst($item->status_verifikasi)
+                                            };
                                         @endphp
 
                                         <tr class="hover:bg-gray-50 transition-colors">
@@ -75,6 +92,27 @@
                                                 @else
                                                     <span class="text-gray-400 text-xs">-</span>
                                                 @endif
+                                            </td>
+
+                                            {{-- Status --}}
+                                            <td class="px-4 py-3 align-top">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClass }}">
+                                                    @if($item->status_verifikasi === 'selesai')
+                                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    @elseif(in_array($item->status_verifikasi, ['batal', 'ditolak']))
+                                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    @elseif($item->status_verifikasi === 'arsip')
+                                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/>
+                                                            <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    @endif
+                                                    {{ $statusText }}
+                                                </span>
                                             </td>
 
                                             {{-- Peserta --}}
@@ -108,28 +146,14 @@
 
                                             {{-- Catatan Admin --}}
                                             <td class="px-4 py-3 align-top text-xs text-gray-700 max-w-xs break-words">
-                                                {{ $item->catatan_admin ?? '-' }}
-                                            </td>
-
-                                            {{-- Sertifikat --}}
-                                            <td class="px-4 py-3 align-top text-center">
-                                                @if ($item->file_sertifikat)
-                                                    <a href="{{ asset('storage/' . $item->file_sertifikat) }}"
-                                                       target="_blank"
-                                                       class="inline-flex items-center gap-1 bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-red-700 transition">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" 
-                                                             fill="none" 
-                                                             viewBox="0 0 24 24" 
-                                                             stroke-width="1.5" 
-                                                             stroke="currentColor"
-                                                             class="w-4 h-4">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                  d="M12 4v16m8-8H4"/>
-                                                        </svg>
-                                                        Unduh
-                                                    </a>
+                                                @if($item->catatan_admin)
+                                                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-2 rounded">
+                                                        <div class="text-xs text-yellow-800">
+                                                            {{ $item->catatan_admin }}
+                                                        </div>
+                                                    </div>
                                                 @else
-                                                    <span class="text-gray-400 text-xs">Belum ada</span>
+                                                    <span class="text-gray-400">-</span>
                                                 @endif
                                             </td>
                                         </tr>

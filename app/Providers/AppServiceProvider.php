@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // // Register Livewire components
+        // Livewire::component('admin.notification-bell', \App\Livewire\Admin\NotificationBellSimple::class);
+        
+        // Register observer untuk auto-notification
+        \App\Models\PendaftaranMagang::observe(\App\Observers\PendaftaranMagangObserver::class);
     }
 }

@@ -6,11 +6,10 @@ use App\Http\Controllers\PendaftaranMagangController;
 use App\Http\Controllers\PendaftaranMagangStatusController;
 use App\Http\Controllers\RiwayatMagangUserController;
 use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Mail;
 
-
-// default route
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/dashboard');
 });
 
 // dashboard route
@@ -49,6 +48,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('pendaftaran.edit');
     Route::put('/pendaftaran/{pendaftaran}', [PendaftaranMagangController::class, 'update'])
         ->name('pendaftaran.update');
+    
+    // Batalkan pendaftaran (hanya untuk status pending)
+    Route::delete('/pendaftaran/{pendaftaran}', [PendaftaranMagangController::class, 'destroy'])
+        ->name('pendaftaran.destroy');
 
 });
 
@@ -66,6 +69,16 @@ Route::middleware('auth')->group(function () {
 // Route::get('/whoami', function () {
 //     return auth()->user();
 // });
+
+
+
+Route::get('/test-email', function () {
+    Mail::raw('Email testing dari Brevo lokal!', function ($m) {
+        $m->to('emailmu@gmail.com')->subject('Test Brevo SMTP');
+    });
+
+    return 'Email dikirim!';
+});
 
 
 require __DIR__.'/auth.php';

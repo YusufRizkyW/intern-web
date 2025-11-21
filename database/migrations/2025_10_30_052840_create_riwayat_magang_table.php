@@ -23,7 +23,7 @@ return new class extends Migration
                 ->default('selesai');
             $table->date('tanggal_mulai')->nullable();
             $table->date('tanggal_selesai')->nullable();
-            $table->string('file_sertifikat')->nullable(); // path ke storage
+            // $table->string('file_sertifikat')->nullable(); // path ke storage
             $table->timestamps();
         });
     }

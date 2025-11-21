@@ -143,22 +143,14 @@ class RiwayatMagangResource extends Resource
                 ])
                 ->columns(2),
 
-            // Catatan & sertifikat (masih bisa diubah admin)
-            Forms\Components\Section::make('Catatan & Sertifikat')
+            // Catatan (masih bisa diubah admin)
+            Forms\Components\Section::make('Catatan')
                 ->schema([
                     Forms\Components\Textarea::make('catatan_admin')
                         ->label('Catatan Admin')
                         ->rows(3)
                         ->helperText('Catatan ini akan terlihat oleh user')
                         ->columnSpanFull(),
-
-                    // Forms\Components\FileUpload::make('file_sertifikat')
-                    //     ->label('Sertifikat (PDF)')
-                    //     ->disk('public')
-                    //     ->directory('sertifikat_magang')
-                    //     ->acceptedFileTypes(['application/pdf'])
-                    //     ->downloadable()
-                    //     ->openable(),
                 ]),
         ]);
     }
@@ -209,6 +201,27 @@ class RiwayatMagangResource extends Resource
                     ->label('Selesai'),
 
             ])
+
+            ->filters([
+                Tables\Filters\SelectFilter::make('status_verifikasi')
+                    ->label('Status')
+                    ->options([
+                        // 'pending'  => 'Pending',
+                        // 'revisi'   => 'Revisi',
+                        // 'diterima' => 'Diterima',
+                        'ditolak'  => 'Ditolak',
+                        // 'aktif'    => 'Aktif',
+                        'selesai'  => 'Selesai',
+                        'batal'    => 'Batal',
+                        'arsip'    => 'Arsip',
+                    ]),
+                Tables\Filters\SelectFilter::make('tipe_pendaftaran')
+                    ->label('Tipe')
+                    ->options([
+                        'individu' => 'Individu',
+                        'tim'      => 'Tim',
+                    ]),
+            ])
             
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -224,7 +237,7 @@ class RiwayatMagangResource extends Resource
     {
         return [
             'index' => Pages\ListRiwayatMagangs::route('/'),
-            'create' => Pages\CreateRiwayatMagang::route('/create'),
+            // 'create' => Pages\CreateRiwayatMagang::route('/create'),
             'edit' => Pages\EditRiwayatMagang::route('/{record}/edit'),
         ];
     }

@@ -22,7 +22,6 @@ class RiwayatMagang extends Model
         'status_verifikasi',
         'tanggal_mulai',
         'tanggal_selesai',
-        'file_sertifikat',
     ];
 
     public function pendaftaranMagang()
@@ -39,7 +38,37 @@ class RiwayatMagang extends Model
     {
         return $this->hasMany(\App\Models\PendaftaranMagangMember::class);
     }
+
+
+    protected static function booted(): void
+    {
+        static::saving(function (RiwayatMagang $riwayat) {
+            $validStatuses = ['selesai', 'batal', 'arsip', 'ditolak'];
+            if (!in_array($riwayat->status_verifikasi, $validStatuses)) {
+                throw new \Exception("Status {$riwayat->status_verifikasi} tidak valid untuk riwayat magang.");
+            }
+        });
+    }
+
+    public function scopeSelesai($query)
+    {
+        return $query->where('status_verifikasi', 'selesai');
+    }
+
+    public function scopeBatal($query)
+    {
+        return $query->where('status_verifikasi', 'batal');
+    }
+
+    public function scopeArsip($query)
+    {
+        return $query->where('status_verifikasi', 'arsip');
+    }
     
+    public function scopeDitolak($query)
+    {
+        return $query->where('status_verifikasi', 'ditolak');
+    }
 
     use HasFactory;
 }

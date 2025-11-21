@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Carbon\Carbon;
 
 class PendaftaranMagang extends Model
 {
@@ -42,25 +44,209 @@ class PendaftaranMagang extends Model
         return $this->hasMany(PendaftaranStatusLog::class);
     }
 
-    // Event untuk mencatat perubahan status
+    /**
+     * Hitung jumlah peserta dalam pendaftaran ini
+     */
+    public function getJumlahPesertaAttribute(): int
+    {
+        if ($this->tipe_pendaftaran === 'individu') {
+            return 1;
+        }
+
+        // Untuk tim: hitung ketua + anggota
+        return $this->members()->count();
+    }
+
+    /**
+     * Dapatkan semua periode (bulan) yang tercover oleh magang ini
+     */
+    public function getPeriodeMagangAttribute(): array
+    {
+        if (!$this->tanggal_mulai || !$this->tanggal_selesai) {
+            // Jika tidak ada tanggal spesifik, gunakan created_at sebagai referensi
+            $tanggal = $this->created_at;
+            return [
+                [
+                    'tahun' => $tanggal->year,
+                    'bulan' => $tanggal->month
+                ]
+            ];
+        }
+
+        $mulai = \Carbon\Carbon::parse($this->tanggal_mulai);
+        $selesai = \Carbon\Carbon::parse($this->tanggal_selesai);
+        $periode = [];
+
+        $current = $mulai->copy()->startOfMonth();
+        $end = $selesai->copy()->startOfMonth();
+
+        while ($current <= $end) {
+            $periode[] = [
+                'tahun' => $current->year,
+                'bulan' => $current->month
+            ];
+            $current->addMonth();
+        }
+
+        return $periode;
+    }
+
+    // Event listener untuk update kuota otomatis
     protected static function booted(): void
     {
+        // Event listener untuk update kuota otomatis
         static::updating(function (PendaftaranMagang $pendaftaran) {
-            // Cek apakah status_verifikasi berubah
-            if ($pendaftaran->isDirty('status_verifikasi')) {
-                $statusLama = $pendaftaran->getOriginal('status_verifikasi');
-                $statusBaru = $pendaftaran->status_verifikasi;
+            $statusLama = $pendaftaran->getOriginal('status_verifikasi');
+            $statusBaru = $pendaftaran->status_verifikasi;
+
+            // ✅ VALIDASI KUOTA SEBELUM APPROVE
+            if ($statusBaru === 'diterima' && $statusLama !== 'diterima') {
+                $validation = $pendaftaran->canBeApprovedDetailed();
                 
-                // Simpan log perubahan status
-                PendaftaranStatusLog::create([
+                if (!$validation['can_approve']) {
+                    throw new \Exception("Tidak dapat menyetujui pendaftaran: " . $validation['message']);
+                }
+            }
+
+            // ✅ PERBAIKAN: Status yang masih AKTIF menggunakan kuota
+            $statusTerpakai = ['diterima', 'aktif']; // Hapus 'selesai'
+            
+            // Status yang sudah FINAL tidak menggunakan kuota lagi
+            $statusFinal = ['selesai', 'batal', 'arsip'];
+            
+            $wasUsingQuota = in_array($statusLama, $statusTerpakai);
+            $willUseQuota = in_array($statusBaru, $statusTerpakai);
+
+            // Jika dari tidak-terpakai ke terpakai
+            if (!$wasUsingQuota && $willUseQuota) {
+                $pendaftaran->updateKuotaMultiPeriode('add');
+            }
+
+            // ✅ PERBAIKAN: Kembalikan kuota jika berubah ke status final
+            if ($wasUsingQuota && !$willUseQuota) {
+                $pendaftaran->updateKuotaMultiPeriode('reduce');
+            }
+            
+
+            // Log perubahan status (tetap sama)
+            if ($pendaftaran->isDirty('status_verifikasi')) {
+                \App\Models\PendaftaranStatusLog::create([
                     'pendaftaran_magang_id' => $pendaftaran->id,
-                    'admin_user_id' => auth()->id(), // ID admin yang sedang login
+                    'admin_user_id' => auth()->id(),
                     'status_lama' => $statusLama,
                     'status_baru' => $statusBaru,
                     'catatan' => $pendaftaran->catatan_admin,
                 ]);
+
+                // Clear notification cache dengan debouncing untuk efisiensi
+                \App\Services\CacheOptimizationService::clearAdminNotificationCacheDebounced();
+            }
+
+            // Pindahkan ke riwayat (tambah status ditolak)
+            $statusRiwayat = ['selesai', 'batal', 'arsip', 'ditolak'];
+            if (in_array($statusBaru, $statusRiwayat) && !in_array($statusLama, $statusRiwayat)) {
+                \App\Models\RiwayatMagang::create([
+                    'pendaftaran_magang_id' => $pendaftaran->id,
+                    'user_id' => $pendaftaran->user_id,
+                    'nama_lengkap' => $pendaftaran->nama_lengkap,
+                    'agency' => $pendaftaran->agency,
+                    'nim' => $pendaftaran->nim,
+                    'email' => $pendaftaran->email,
+                    'no_hp' => $pendaftaran->no_hp,
+                    'link_drive' => $pendaftaran->link_drive,
+                    'catatan_admin' => $pendaftaran->catatan_admin,
+                    'status_verifikasi' => $statusBaru,
+                    'tanggal_mulai' => $pendaftaran->tanggal_mulai,
+                    'tanggal_selesai' => $pendaftaran->tanggal_selesai,
+                ]);
             }
         });
     }
+
+    /**
+     * Update kuota untuk semua periode yang tercover
+     */
+    private function updateKuotaMultiPeriode(string $action): void
+    {
+        $jumlahPeserta = $this->jumlah_peserta;
+        $periodeMagang = $this->periode_magang;
+
+        foreach ($periodeMagang as $periode) {
+            $kuota = KuotaMagang::getKuotaForPeriode(
+                $periode['tahun'],
+                $periode['bulan']
+            );
+
+            if ($kuota) {
+                if ($action === 'add') {
+                    $kuota->addKuotaTerisi($jumlahPeserta);
+                } elseif ($action === 'reduce') {
+                    $kuota->reduceKuotaTerisi($jumlahPeserta);
+                }
+            }
+        }
+    }
+
+    /**
+     * Cek apakah pendaftaran ini bisa disetujui berdasarkan kuota (detailed)
+     */
+    public function canBeApprovedDetailed(): array
+    {
+        $periodeMagang = $this->periode_magang;
+        $jumlahPeserta = $this->jumlah_peserta;
+        
+        $periodeBermasalah = [];
+        
+        foreach ($periodeMagang as $periode) {
+            $kuota = KuotaMagang::getKuotaForPeriode(
+                $periode['tahun'],
+                $periode['bulan']
+            );
+            
+            if (!$kuota) {
+                $namaBulan = KuotaMagang::getNamaBulan($periode['bulan']);
+                $periodeBermasalah[] = "{$namaBulan} {$periode['tahun']} (Kuota belum dibuat)";
+            } elseif (!$kuota->isKuotaAvailable($jumlahPeserta)) {
+                $namaBulan = KuotaMagang::getNamaBulan($periode['bulan']);
+                $periodeBermasalah[] = "{$namaBulan} {$periode['tahun']} (Sisa: {$kuota->sisa_kuota}, Butuh: {$jumlahPeserta})";
+            }
+        }
+        
+        return [
+            'can_approve' => empty($periodeBermasalah),
+            'problematic_periods' => $periodeBermasalah,
+            'message' => empty($periodeBermasalah) 
+                ? 'Kuota tersedia untuk semua periode' 
+                : 'Kuota tidak cukup untuk periode: ' . implode(', ', $periodeBermasalah)
+        ];
+    }
+
+    /**
+     * Validasi kuota sebelum approve - cek semua periode (simple boolean)
+     */
+    public function canBeApproved(): bool
+    {
+        $validation = $this->canBeApprovedDetailed();
+        return $validation['can_approve'];
+    }
+
+    /**
+     * Get info periode yang bermasalah (untuk error message)
+     */
+    public function getPeriodeTidakTersediaAttribute(): ?array
+    {
+        $validation = $this->canBeApprovedDetailed();
+        return $validation['can_approve'] ? null : $validation;
+    }
+
+    // Method lama untuk backward compatibility
+    private function updateKuota(string $action): void
+    {
+        $this->updateKuotaMultiPeriode($action);
+    }
+
+    
+
+    
 }
 

@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 
 class PendaftaranMagangResource extends Resource
@@ -20,7 +21,7 @@ class PendaftaranMagangResource extends Resource
     protected static ?string $navigationIcon  = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'Pendaftar';
     protected static ?string $navigationGroup = 'Magang';
-    protected static ?int    $navigationSort  = 1;
+    protected static ?int    $navigationSort  = 2;
 
     public static function form(Form $form): Form
     {
@@ -123,13 +124,48 @@ class PendaftaranMagangResource extends Resource
                             'revisi'   => 'Perlu Revisi',
                             'diterima' => 'Diterima',
                             'ditolak'  => 'Ditolak',
-                            // nanti kalau mau lanjut pipeline bisa tambahin:
                             // 'aktif'    => 'Sedang Magang',
                             // 'selesai'  => 'Selesai',
                             // 'batal'    => 'Dibatalkan',
                             // 'arsip'    => 'Diarsipkan',
                         ])
-                        ->required(),
+                        ->required()
+                        ->reactive()
+                        ->helperText(function (Forms\Get $get, ?\Illuminate\Database\Eloquent\Model $record) {
+                            if (!$record) return null;
+                            
+                            $statusBaru = $get('status_verifikasi');
+                            $statusLama = $record->getOriginal('status_verifikasi');
+                            
+                            // Jika akan diubah ke 'diterima', cek kuota
+                            if ($statusBaru === 'diterima' && $statusLama !== 'diterima') {
+                                $validation = $record->canBeApprovedDetailed();
+                                
+                                if (!$validation['can_approve']) {
+                                    return '⚠️ ' . $validation['message'];
+                                } else {
+                                    return '✅ ' . $validation['message'];
+                                }
+                            }
+                            
+                            return null;
+                        })
+                        ->rules([
+                            function () {
+                                return function (string $attribute, $value, \Closure $fail) {
+                                    if ($value === 'diterima') {
+                                        $record = request()->route('record');
+                                        if ($record && $record->getOriginal('status_verifikasi') !== 'diterima') {
+                                            $validation = $record->canBeApprovedDetailed();
+                                            
+                                            if (!$validation['can_approve']) {
+                                                $fail($validation['message']);
+                                            }
+                                        }
+                                    }
+                                };
+                            }
+                        ]),
                 ]),
         ]);
     }
@@ -202,30 +238,32 @@ class PendaftaranMagangResource extends Resource
                         'tim'      => 'Tim',
                     ]),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-            ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            // ✅ PERFORMANCE OPTIMIZATIONS
+            ->defaultPaginationPageOption(25) // Reduce dari 50 ke 25 untuk loading lebih cepat
+            ->defaultSort('created_at', 'desc') // Default sort
+            ->striped() // Striped table untuk readability
+            ->poll('60s'); // Auto refresh tiap 60 detik untuk mengurangi beban server
     }
 
     /**
-     * Di resource ini kita TAMPILKAN dulu pendaftar yang masih “di depan”
-     * (pending, revisi, ditolak). Yang sudah diterima / aktif nanti bisa
-     * dipisah ke resource lain seperti MagangDiterimaResource.
+     * Tampilkan semua pendaftaran untuk pengelolaan admin
+     * ✅ OPTIMIZED: Eager loading dan filter yang efisien
      */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with('user')
+            ->with(['user:id,name,email', 'members:id,pendaftaran_magang_id,nama_anggota,is_ketua'])
             ->whereIn('status_verifikasi', [
                 'pending',
                 'revisi',
-                // 'ditolak',
-                // 'diterima', // ini aku ikutkan juga biar admin masih bisa ubah
-            ]);
+                // 'diterima',
+                // 'aktif',
+                // 'ditolak', 'selesai', 'batal', 'arsip' sudah pindah ke riwayat
+            ])
+            ->latest('created_at'); // Default sort untuk performa
     }
 
     public static function getRelations(): array

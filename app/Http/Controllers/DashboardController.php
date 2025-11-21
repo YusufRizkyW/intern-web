@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PendaftaranMagang;
+use App\Models\KuotaMagang;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -21,6 +22,7 @@ class DashboardController extends Controller
                 'pending', 'revisi', 'diterima', 'aktif',
             ])->count(),
             'selesai' => PendaftaranMagang::where('status_verifikasi', 'selesai')->count(),
+            'pendaftar' => PendaftaranMagang::where('status_verifikasi', 'pending')->count(),
         ];
 
         // ---------- Pendaftaran terbaru user (kalau login) ----------
@@ -122,13 +124,24 @@ class DashboardController extends Controller
         // OPTIONAL: sort calendarGlobal by key agar predictable
         ksort($calendarGlobal);
 
-        // -- debug sementara (uncomment jika butuh) --
-        // \Log::debug('calendarGlobal', $calendarGlobal);
-        // dd($calendarGlobal);
-        // dd($stats);
+        // ---------- AMBIL DATA KUOTA BULAN INI ----------
+        $year  = $currentMonth->year;
+        $month = $currentMonth->month;
 
-        // ... setelah membangun $calendarGlobal, $userActiveDates, dll
+        // ambil kuota bulan ini
+        $kuota = KuotaMagang::where('tahun', $year)
+            ->where('bulan', $month)
+            ->where('is_active', true)
+            ->first();
 
+        $kuota_bulan  = $kuota ? $kuota->kuota_maksimal : null;
+        $kuota_terisi = $kuota ? $kuota->kuota_terisi : 0;
+        $kuota_sisa   = $kuota ? max(0, $kuota->kuota_maksimal - $kuota->kuota_terisi) : null;
+
+        // ---------- AMBIL KUOTA TERSEDIA UNTUK DASHBOARD ----------
+        $kuotaTersedia = $this->getKuotaTersedia();
+
+        // ---------- PREPARE DATA UNTUK VIEW ----------
         $data = [
             'stats'             => $stats,
             'pendaftaranTerbaru' => $pendaftaranTerbaru,
@@ -137,6 +150,10 @@ class DashboardController extends Controller
             'currentMonth'      => $currentMonth,
             'startOfCalendar'   => $startOfCalendar,
             'endOfCalendar'     => $endOfCalendar,
+            'kuota_bulan'       => $kuota_bulan,
+            'kuota_terisi'      => $kuota_terisi,
+            'kuota_sisa'        => $kuota_sisa,
+            'kuotaTersedia'     => $kuotaTersedia, // ✅ Tambahan untuk dashboard
         ];
 
         // jika request AJAX (fetch dari JS), kembalikan hanya partial calendar
@@ -147,6 +164,37 @@ class DashboardController extends Controller
 
         // default: render halaman penuh
         return view('dashboard', $data);
+    }
 
+    /**
+     * Ambil data kuota tersedia untuk beberapa bulan ke depan
+     */
+    private function getKuotaTersedia()
+    {
+        $currentDate = Carbon::now();
+        $endDate = $currentDate->copy()->addMonths(6); // 6 bulan ke depan
+
+        return KuotaMagang::where(function ($query) use ($currentDate, $endDate) {
+            $query->where(function ($q) use ($currentDate) {
+                // Bulan ini atau setelahnya
+                $q->where('tahun', '>', $currentDate->year)
+                  ->orWhere(function ($qq) use ($currentDate) {
+                      $qq->where('tahun', '=', $currentDate->year)
+                         ->where('bulan', '>=', $currentDate->month);
+                  });
+            })
+            ->where(function ($q) use ($endDate) {
+                // Maksimal 6 bulan ke depan
+                $q->where('tahun', '<', $endDate->year)
+                  ->orWhere(function ($qq) use ($endDate) {
+                      $qq->where('tahun', '=', $endDate->year)
+                         ->where('bulan', '<=', $endDate->month);
+                  });
+            });
+        })
+        ->orderBy('tahun', 'asc')
+        ->orderBy('bulan', 'asc')
+        ->limit(8) // Maksimal 8 card untuk menghindari terlalu penuh
+        ->get();
     }
 }

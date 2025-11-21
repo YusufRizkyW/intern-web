@@ -1,0 +1,279 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+/* Fix button visibility - ensure all buttons are visible with proper contrast */
+
+/* Primary buttons */
+.fi-btn-primary,
+.fi-btn[data-color="primary"],
+button[type="submit"],
+.fi-ac-btn-action[data-color="primary"],
+.fi-header-actions .fi-btn,
+.fi-ta-actions .fi-btn {
+    background-color: #3b82f6 !important;
+    border: 1px solid #2563eb !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-btn-primary:hover,
+.fi-btn[data-color="primary"]:hover,
+button[type="submit"]:hover,
+.fi-ac-btn-action[data-color="primary"]:hover,
+.fi-header-actions .fi-btn:hover,
+.fi-ta-actions .fi-btn:hover {
+    background-color: #2563eb !important;
+    border-color: #1d4ed8 !important;
+    color: white !important;
+}
+
+/* Secondary/Gray buttons */
+.fi-btn-secondary,
+.fi-btn[data-color="gray"],
+.fi-btn[data-color="secondary"] {
+    background-color: #f3f4f6 !important;
+    border: 1px solid #d1d5db !important;
+    color: #374151 !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-btn-secondary:hover,
+.fi-btn[data-color="gray"]:hover,
+.fi-btn[data-color="secondary"]:hover {
+    background-color: #e5e7eb !important;
+    border-color: #9ca3af !important;
+    color: #1f2937 !important;
+}
+
+/* Success/Green buttons */
+.fi-btn-success,
+.fi-btn[data-color="success"] {
+    background-color: #10b981 !important;
+    border: 1px solid #059669 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+}
+
+.fi-btn-success:hover,
+.fi-btn[data-color="success"]:hover {
+    background-color: #059669 !important;
+    border-color: #047857 !important;
+    color: white !important;
+}
+
+/* Danger/Red buttons */
+.fi-btn-danger,
+.fi-btn[data-color="danger"] {
+    background-color: #ef4444 !important;
+    border: 1px solid #dc2626 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+}
+
+.fi-btn-danger:hover,
+.fi-btn[data-color="danger"]:hover {
+    background-color: #dc2626 !important;
+    border-color: #b91c1c !important;
+    color: white !important;
+}
+
+/* Warning/Yellow buttons */
+.fi-btn-warning,
+.fi-btn[data-color="warning"] {
+    background-color: #f59e0b !important;
+    border: 1px solid #d97706 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+}
+
+.fi-btn-warning:hover,
+.fi-btn[data-color="warning"]:hover {
+    background-color: #d97706 !important;
+    border-color: #b45309 !important;
+    color: white !important;
+}
+
+/* Info/Blue buttons */
+.fi-btn-info,
+.fi-btn[data-color="info"] {
+    background-color: #3b82f6 !important;
+    border: 1px solid #2563eb !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+}
+
+.fi-btn-info:hover,
+.fi-btn[data-color="info"]:hover {
+    background-color: #2563eb !important;
+    border-color: #1d4ed8 !important;
+    color: white !important;
+}
+
+/* Create new button specific styling */
+.fi-header-actions .fi-btn-primary,
+.fi-ta-actions .fi-btn-primary,
+a[href*="create"] {
+    background-color: #10b981 !important;
+    border: 1px solid #059669 !important;
+    color: white !important;
+}
+
+.fi-header-actions .fi-btn-primary:hover,
+.fi-ta-actions .fi-btn-primary:hover,
+a[href*="create"]:hover {
+    background-color: #059669 !important;
+    border-color: #047857 !important;
+    color: white !important;
+}
+
+/* Action buttons in tables */
+.fi-ta-actions .fi-btn,
+.fi-ta-action {
+    min-width: auto !important;
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Icon only buttons */
+.fi-btn[aria-label],
+.fi-icon-btn {
+    background-color: #f3f4f6 !important;
+    border: 1px solid #d1d5db !important;
+    color: #374151 !important;
+    padding: 0.5rem !important;
+    border-radius: 0.375rem !important;
+}
+
+.fi-btn[aria-label]:hover,
+.fi-icon-btn:hover {
+    background-color: #e5e7eb !important;
+    border-color: #9ca3af !important;
+    color: #1f2937 !important;
+}
+
+/* Form submit buttons */
+form button[type="submit"],
+.fi-form-actions button[type="submit"] {
+    background-color: #3b82f6 !important;
+    border: 1px solid #2563eb !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.625rem 1.25rem !important;
+    border-radius: 0.375rem !important;
+}
+
+form button[type="submit"]:hover,
+.fi-form-actions button[type="submit"]:hover {
+    background-color: #2563eb !important;
+    border-color: #1d4ed8 !important;
+    color: white !important;
+}
+
+/* Link buttons */
+.fi-link {
+    color: #3b82f6 !important;
+    text-decoration: underline !important;
+    font-weight: 500 !important;
+}
+
+.fi-link:hover {
+    color: #2563eb !important;
+}
+
+/* Ensure text is visible in all buttons */
+.fi-btn,
+button,
+a.fi-btn {
+    text-shadow: none !important;
+    -webkit-text-stroke: 0 !important;
+}
+
+/* ✅ PERFORMANCE CSS OPTIMIZATIONS */
+
+/* Reduce animations untuk perception yang lebih cepat */
+*, *::before, *::after {
+    transition-duration: 0.15s !important;
+}
+
+/* Optimize table rendering */
+.fi-ta-table {
+    will-change: scroll-position;
+}
+
+/* Faster form rendering */
+.fi-fo-component-ctn {
+    contain: layout;
+}
+
+/* Optimize sidebar */
+.fi-sidebar {
+    contain: layout style;
+}
+
+/* Optimize notification bell */
+.notification-bell-dropdown {
+    contain: layout style;
+    will-change: opacity, transform;
+}
+
+/* Reduce motion untuk better performance */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Custom scrollbar untuk performa */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Optimize badge rendering */
+.fi-badge {
+    contain: layout style;
+}
+
+/* Faster modal rendering */
+.fi-modal {
+    contain: layout;
+}
+
+/* Performance optimizations for large tables */
+.fi-ta-table tbody tr {
+    contain: layout;
+}
+
+/* Optimize icon rendering */
+.fi-icon {
+    contain: layout size;
+}
