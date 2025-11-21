@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="mb-4 text-sm text-gray-600">
-        {{ __('Lupa password Anda? Tidak masalah. Beri tahu kami alamat email Anda dan kami akan mengirimkan tautan reset password yang memungkinkan Anda memilih yang baru.') }}
+        {{ __('Lupa password Anda? Masukkan email Anda dan kami akan mengirimkan tautan untuk mereset password Anda.') }}
     </div>
 
     <!-- Session Status -->

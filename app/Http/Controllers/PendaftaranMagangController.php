@@ -167,7 +167,7 @@ class PendaftaranMagangController extends Controller
         }
 
         // Cek apakah status masih pending
-        if ($pendaftaran->status_verifikasi !== 'pending') {
+        if (!in_array($pendaftaran->status_verifikasi, ['pending', 'revisi'], true)) {
             return redirect()
                 ->route('pendaftaran.status')
                 ->with('error', 'Pendaftaran tidak dapat diedit. Status saat ini: ' . $pendaftaran->status_verifikasi);
@@ -184,7 +184,7 @@ class PendaftaranMagangController extends Controller
         }
 
         // Cek apakah status masih pending
-        if ($pendaftaran->status_verifikasi !== 'pending') {
+        if (!in_array($pendaftaran->status_verifikasi, ['pending', 'revisi'], true)) {
             return redirect()
                 ->route('pendaftaran.status')
                 ->with('error', 'Pendaftaran tidak dapat diedit. Status saat ini: ' . $pendaftaran->status_verifikasi);
@@ -247,6 +247,9 @@ class PendaftaranMagangController extends Controller
                 'tanggal_mulai'    => $tanggalMulai,
                 'tanggal_selesai'  => $tanggalSelesai,
                 'link_drive'       => $request->link_drive,
+
+                // Reset status verifikasi ke pending setelah update
+                'status_verifikasi' => 'pending',
             ]);
 
             // Update anggota tim (hapus yang lama, buat yang baru)

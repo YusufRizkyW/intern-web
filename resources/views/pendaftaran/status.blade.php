@@ -271,13 +271,6 @@
                             @else
                                 <p class="text-xs text-gray-400">Belum ada link drive.</p>
                             @endif
-
-                            @if ($pendaftaran->status_verifikasi === 'revisi')
-                                <div class="mt-3 p-3 bg-blue-50 text-blue-700 text-xs rounded">
-                                    Dokumen Anda perlu diperbaiki. Silakan perbarui berkas di folder
-                                    Google Drive yang sudah Anda kirim, lalu pastikan link tetap bisa diakses.
-                                </div>
-                            @endif
                         </div>
 
                         {{-- Catatan Admin --}}
@@ -346,56 +339,27 @@
                                 @break
                                 
                             @case('revisi')
-                                <div class="p-4 bg-blue-50 border border-blue-200 rounded">
-                                    <p class="text-sm text-blue-700 font-medium mb-2">
-                                        Beberapa data atau dokumen perlu direvisi.
-                                    </p>
-                                    <p class="text-xs text-blue-600 mb-3">
-                                        Silakan cek catatan admin di atas dan perbaiki sesuai petunjuk.
-                                    </p>
-                                    <p class="text-xs text-blue-500">
-                                        <strong>Catatan:</strong> Saat status revisi, Anda tidak dapat mengedit form. 
-                                        Silakan perbaiki dokumen di Google Drive dan hubungi admin.
-                                    </p>
-                                </div>
-                                @break
-                                
-                            @case('diterima')
-                                <div class="p-4 bg-green-50 border border-green-200 rounded">
-                                    <p class="text-sm text-green-700 font-medium">
-                                        🎉 Selamat! Pendaftaran Anda sudah diterima.
-                                    </p>
-                                    <p class="text-xs text-green-600">
-                                        Silakan menunggu informasi teknis lebih lanjut dari admin.
-                                    </p>
-                                </div>
-                                @break
-                                
-                            @case('aktif')
-                                <div class="p-4 bg-green-50 border border-green-200 rounded">
-                                    <p class="text-sm text-green-700 font-medium">
-                                        🚀 Anda sedang menjalani periode magang.
-                                    </p>
-                                    <p class="text-xs text-green-600">
-                                        Pastikan link Google Drive tetap bisa diakses untuk monitoring progress.
-                                    </p>
-                                </div>
-                                @break
-                                
-                            @case('ditolak')
-                                <div class="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded">
-                                    <div>
-                                        <p class="text-sm text-red-700 font-medium">
-                                            Pendaftaran Anda ditolak.
+                                <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded">
+                                    <div class="flex-1">
+                                        <p class="text-sm text-blue-700 font-medium mb-2">
+                                            Beberapa data atau dokumen perlu direvisi.
                                         </p>
-                                        <p class="text-xs text-red-600">
-                                            Silakan hubungi admin untuk informasi lebih lanjut atau ajukan pendaftaran baru.
+                                        <p class="text-xs text-blue-600 mb-2">
+                                            Silakan cek catatan admin di atas dan perbaiki sesuai petunjuk.
+                                        </p>
+                                        <p class="text-xs text-blue-600">
+                                            Setelah diperbarui, pendaftaran Anda akan direview ulang oleh admin.
                                         </p>
                                     </div>
-                                    <a href="{{ route('pendaftaran.create') }}"
-                                       class="bg-red-600 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-red-700 transition">
-                                        Ajukan Ulang
-                                    </a>
+                                    
+                                    {{-- Action button --}}
+                                    <div class="flex items-center">
+                                        {{-- Tombol Edit --}}
+                                        <a href="{{ route('pendaftaran.edit', $pendaftaran->id) }}"
+                                           class="bg-blue-600 text-white px-4 py-2 rounded font-semibold text-sm hover:bg-blue-700 transition">
+                                            Edit Pendaftaran
+                                        </a>
+                                    </div>
                                 </div>
                                 @break
                                 
@@ -416,7 +380,7 @@
                                         🚀 Anda sedang menjalani periode magang.
                                     </p>
                                     <p class="text-xs text-green-600">
-                                        Pastikan link Google Drive tetap bisa diakses untuk monitoring progress.
+                                        Pastikan link Google Drive tetap bisa diakses.
                                     </p>
                                 </div>
                                 @break
