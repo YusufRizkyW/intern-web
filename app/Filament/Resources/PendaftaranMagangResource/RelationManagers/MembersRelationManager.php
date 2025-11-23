@@ -44,6 +44,11 @@ class MembersRelationManager extends RelationManager
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->rowIndex()
+                    ->label('No')
+                    ->alignCenter(),
+
                 Tables\Columns\TextColumn::make('nama_anggota')
                     ->label('Nama')
                     ->searchable(),
@@ -64,12 +69,8 @@ class MembersRelationManager extends RelationManager
                     ->label('Ketua')
                     ->boolean(),
             ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make(),
-            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
