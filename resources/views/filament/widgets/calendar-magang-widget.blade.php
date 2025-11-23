@@ -59,7 +59,7 @@
                     <div class="h-14 flex flex-col items-center justify-center rounded border {{ $bg }} {{ $isCurrentMonth ? '' : 'opacity-40' }} relative">
                         <div class="text-xs font-semibold">{{ $date->day }}</div>
                         @if($count > 0)
-                            <div class="text-[10px] font-medium">{{ $count }} org</div>
+                            <div class="text-[10px] font-medium">{{ $count }} psrt</div>
                         @endif
                     </div>
 
@@ -75,15 +75,15 @@
                 </div>
                 <div class="flex items-center gap-1">
                     <div class="w-3 h-3 bg-emerald-100 border border-emerald-200 rounded"></div>
-                    <span class="text-gray-600">1-3 org</span>
+                    <span class="text-gray-600">1-3 psrt</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <div class="w-3 h-3 bg-yellow-100 border border-yellow-200 rounded"></div>
-                    <span class="text-gray-600">4-7 org</span>
+                    <span class="text-gray-600">4-7 psrt</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <div class="w-3 h-3 bg-red-100 border border-red-200 rounded"></div>
-                    <span class="text-gray-600">8+ org</span>
+                    <span class="text-gray-600">8+ psrt</span>
                 </div>
             </div>
         </div>

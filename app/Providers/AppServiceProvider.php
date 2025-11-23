@@ -28,10 +28,5 @@ class AppServiceProvider extends ServiceProvider
          // Set locale untuk Carbon
         Carbon::setLocale('id');
         
-        // // Register Livewire components
-        // Livewire::component('admin.notification-bell', \App\Livewire\Admin\NotificationBellSimple::class);
-        
-        // Register observer untuk auto-notification
-        \App\Models\PendaftaranMagang::observe(\App\Observers\PendaftaranMagangObserver::class);
     }
 }

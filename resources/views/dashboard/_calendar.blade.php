@@ -134,7 +134,7 @@
                     <div class="relative h-16 flex flex-col items-center justify-center rounded-lg transition-all duration-200 hover:scale-105 {{ $bgClass }} {{ $extraClass }}">
                         <div class="text-sm font-bold">{{ $date->day }}</div>
                         @if ($count > 0)
-                            <div class="text-xs font-medium opacity-75">{{ $count }} org</div>
+                            <div class="text-xs font-medium opacity-75">{{ $count }} psrt</div>
                         @endif
                         
                         {{-- Today indicator --}}

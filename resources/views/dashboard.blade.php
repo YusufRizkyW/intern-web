@@ -284,7 +284,7 @@
                         <div>
                             <div class="font-semibold">Kirim Link Google Drive</div>
                             <div class="text-[11px] text-gray-500">
-                                Upload berkas (CV, surat pengantar, KTM, dll) ke Drive dan kirim link-nya.
+                                Upload berkas (Surat Pengantar) ke Drive dan salin link-nya.
                             </div>
                         </div>
                     </li>
