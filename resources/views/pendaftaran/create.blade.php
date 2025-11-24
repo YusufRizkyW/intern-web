@@ -238,7 +238,7 @@
                             <input type="url" name="link_drive" value="{{ old('link_drive') }}"
                                    class="w-full border rounded p-2 text-sm" required>
                             <p class="text-xs text-gray-500 mt-1">
-                                Satu link bisa berisi semua dokumen peserta yang Anda daftarkan ini.
+                                Silahkan upload dokumen (surat pengantar) dan salin link folder Google Drive yang berisi dokumen peserta, pastikan pengaturan link dapat diakses oleh siapa saja yang memiliki link.
                             </p>
                         </div>
 
