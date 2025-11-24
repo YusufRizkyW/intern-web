@@ -19,9 +19,10 @@ class PendaftaranMagangController extends Controller
         // 1. VALIDASI UMUM (selalu wajib)
         $request->validate([
             'tipe_pendaftaran' => 'required|in:individu,tim',
-            'tipe_periode'     => 'required|in:durasi,tanggal',
             'link_drive'       => ['required','url','regex:/^https:\/\/(drive|docs)\.google\.com/'],
             'agency'           => 'required|string|max:255',
+            'tanggal_mulai'    => 'required|date',
+            'tanggal_selesai'  => 'required|date|after_or_equal:tanggal_mulai',
         ]);
 
         // 2. VALIDASI PER TIPE PENDAFTARAN
@@ -44,21 +45,9 @@ class PendaftaranMagangController extends Controller
             ]);
         }
 
-        // 3. VALIDASI PERIODE
-        if ($request->tipe_periode === 'durasi') {
-            $request->validate([
-                'durasi_bulan' => 'required|integer|min:1|max:12',
-            ]);
-            $tanggalMulai   = null;
-            $tanggalSelesai = null;
-        } else {
-            $request->validate([
-                'tanggal_mulai'   => 'required|date',
-                'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-            ]);
-            $tanggalMulai   = $request->tanggal_mulai;
-            $tanggalSelesai = $request->tanggal_selesai;
-        }
+        // 3. PERIODE - selalu gunakan tanggal
+        $tanggalMulai   = $request->tanggal_mulai;
+        $tanggalSelesai = $request->tanggal_selesai;
 
         DB::beginTransaction();
         try {
@@ -81,8 +70,6 @@ class PendaftaranMagangController extends Controller
                     'link_drive'        => $request->link_drive,
 
                     // periode
-                    'tipe_periode'      => $request->tipe_periode,
-                    'durasi_bulan'      => $request->tipe_periode === 'durasi' ? $request->durasi_bulan : null,
                     'tanggal_mulai'     => $tanggalMulai,
                     'tanggal_selesai'   => $tanggalSelesai,
 
@@ -120,8 +107,6 @@ class PendaftaranMagangController extends Controller
                     'link_drive'        => $request->link_drive,
 
                     // periode
-                    'tipe_periode'      => $request->tipe_periode,
-                    'durasi_bulan'      => $request->tipe_periode === 'durasi' ? $request->durasi_bulan : null,
                     'tanggal_mulai'     => $tanggalMulai,
                     'tanggal_selesai'   => $tanggalSelesai,
 
@@ -193,9 +178,10 @@ class PendaftaranMagangController extends Controller
         // 1. VALIDASI UMUM (selalu wajib)
         $request->validate([
             'tipe_pendaftaran' => 'required|in:individu,tim',
-            'tipe_periode'     => 'required|in:durasi,tanggal',
             'link_drive'       => ['required','url','regex:/^https:\/\/(drive|docs)\.google\.com/'],
             'agency'           => 'required|string|max:255',
+            'tanggal_mulai'    => 'required|date',
+            'tanggal_selesai'  => 'required|date|after_or_equal:tanggal_mulai',
         ]);
 
         // 2. VALIDASI PER TIPE PENDAFTARAN
@@ -216,21 +202,9 @@ class PendaftaranMagangController extends Controller
             ]);
         }
 
-        // 3. VALIDASI PERIODE
-        if ($request->tipe_periode === 'durasi') {
-            $request->validate([
-                'durasi_bulan' => 'required|integer|min:1|max:12',
-            ]);
-            $tanggalMulai = null;
-            $tanggalSelesai = null;
-        } else {
-            $request->validate([
-                'tanggal_mulai'   => 'required|date',
-                'tanggal_selesai' => 'required|date|after:tanggal_mulai',
-            ]);
-            $tanggalMulai = $request->tanggal_mulai;
-            $tanggalSelesai = $request->tanggal_selesai;
-        }
+        // 3. PERIODE - selalu gunakan tanggal
+        $tanggalMulai = $request->tanggal_mulai;
+        $tanggalSelesai = $request->tanggal_selesai;
 
         DB::beginTransaction();
         try {
@@ -242,8 +216,6 @@ class PendaftaranMagangController extends Controller
                 'email'            => $request->email ?? $request->anggota[0]['email'] ?? '',
                 'no_hp'            => $request->no_hp ?? $request->anggota[0]['no_hp'] ?? '',
                 'agency'           => $request->agency,
-                'tipe_periode'     => $request->tipe_periode,
-                'durasi_bulan'     => $request->durasi_bulan,
                 'tanggal_mulai'    => $tanggalMulai,
                 'tanggal_selesai'  => $tanggalSelesai,
                 'link_drive'       => $request->link_drive,

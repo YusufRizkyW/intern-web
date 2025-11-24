@@ -67,18 +67,6 @@ class MagangAktifResource extends Resource
             // 3. periode
             Forms\Components\Section::make('Periode Magang')
                 ->schema([
-                    Forms\Components\Select::make('tipe_periode')
-                        ->label('Mode Periode')
-                        ->options([
-                            'durasi'  => 'Durasi (x bulan)',
-                            'tanggal' => 'Tanggal Mulai & Selesai',
-                        ])
-                        ->disabled(),
-
-                    Forms\Components\TextInput::make('durasi_bulan')
-                        ->label('Durasi (bulan)')
-                        ->disabled(),
-
                     Forms\Components\DatePicker::make('tanggal_mulai')
                         ->label('Tanggal Mulai')
                         ->disabled(),
@@ -205,7 +193,6 @@ class MagangAktifResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

@@ -69,9 +69,6 @@ class MembersRelationManager extends RelationManager
                     ->label('Ketua')
                     ->boolean(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);

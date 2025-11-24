@@ -183,48 +183,19 @@
                         <div class="space-y-4">
                             <label class="block text-sm font-semibold text-gray-700">Periode Magang</label>
 
-                            <div class="space-y-6 border rounded p-4">
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="tipe_periode" value="durasi"
-                                           class="mt-1" {{ old('tipe_periode','durasi') === 'durasi' ? 'checked' : '' }}>
-                                    <span>
-                                        <span class="text-sm font-medium">Pakai durasi</span>
-                                        <span class="block text-xs text-gray-500">1–6 bulan</span>
-                                    </span>
-                                </label>
-
-                                <div id="durasi-wrapper" @if(old('tipe_periode')==='tanggal') style="display:none" @endif class="ml-6">
-                                    <select name="durasi_bulan" class="border rounded p-2 text-sm w-40">
-                                        <option value="">-- pilih --</option>
-                                        @for ($i=1; $i<=6; $i++)
-                                            <option value="{{ $i }}" {{ old('durasi_bulan')==$i ? 'selected' : '' }}>{{ $i }} bulan</option>
-                                        @endfor
-                                    </select>
-                                </div>
-
-                                <div class="border-t pt-4"></div>
-
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="tipe_periode" value="tanggal"
-                                           class="mt-1" {{ old('tipe_periode') === 'tanggal' ? 'checked' : '' }}>
-                                    <span>
-                                        <span class="text-sm font-medium">Pakai tanggal mulai & selesai</span>
-                                    </span>
-                                </label>
-
-                                <div id="tanggal-wrapper" @if(old('tipe_periode','durasi')==='durasi') style="display:none" @endif
-                                     class="ml-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-4 border rounded p-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs text-gray-700 mb-1">Tanggal Mulai</label>
+                                        <label class="block text-sm text-gray-700 mb-1">Tanggal Mulai <span class="text-red-500">*</span></label>
                                         <input type="date" name="tanggal_mulai"
                                                value="{{ old('tanggal_mulai') }}"
-                                               class="border rounded p-2 text-sm w-full">
+                                               class="border rounded p-2 text-sm w-full" required>
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-700 mb-1">Tanggal Selesai</label>
+                                        <label class="block text-sm text-gray-700 mb-1">Tanggal Selesai <span class="text-red-500">*</span></label>
                                         <input type="date" name="tanggal_selesai"
                                                value="{{ old('tanggal_selesai') }}"
-                                               class="border rounded p-2 text-sm w-full">
+                                               class="border rounded p-2 text-sm w-full" required>
                                     </div>
                                 </div>
                             </div>
