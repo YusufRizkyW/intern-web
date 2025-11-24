@@ -12,17 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('pendaftaran_magangs', function (Blueprint $table) {
-            $table->enum('tipe_periode', ['durasi', 'tanggal'])->default('durasi');
-            $table->integer('durasi_bulan')->nullable(); // contoh: 1, 2, 3
-            $table->date('tanggal_mulai')->nullable();
-            $table->date('tanggal_selesai')->nullable();
+            $table->date('tanggal_mulai')->required();
+            $table->date('tanggal_selesai')->required();
         });
     }
 
     public function down(): void
     {
-        Schema::table('pendaftaran_magang', function (Blueprint $table) {
-            $table->dropColumn(['tipe_periode', 'durasi_bulan', 'tanggal_mulai', 'tanggal_selesai']);
+        Schema::table('pendaftaran_magangs', function (Blueprint $table) {
+            $table->dropColumn(['tipe_periode', 'tanggal_mulai', 'tanggal_selesai']);
         });
     }
 

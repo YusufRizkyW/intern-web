@@ -165,44 +165,19 @@
                         {{-- 4. Periode --}}
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Periode Magang</label>
-                            <div class="flex gap-4 mb-3">
-                                <label class="flex items-center gap-2">
-                                    <input type="radio" name="tipe_periode" value="durasi" 
-                                           {{ old('tipe_periode', $pendaftaran->tipe_periode) === 'durasi' ? 'checked' : '' }}>
-                                    <span class="text-sm">Berdasarkan Durasi</span>
-                                </label>
-                                <label class="flex items-center gap-2">
-                                    <input type="radio" name="tipe_periode" value="tanggal" 
-                                           {{ old('tipe_periode', $pendaftaran->tipe_periode) === 'tanggal' ? 'checked' : '' }}>
-                                    <span class="text-sm">Berdasarkan Tanggal</span>
-                                </label>
-                            </div>
-
-                            {{-- Input durasi --}}
-                            <div id="durasi-wrapper" class="{{ old('tipe_periode', $pendaftaran->tipe_periode) === 'durasi' ? '' : 'hidden' }}">
-                                <label class="block text-xs text-gray-700 mb-1">Durasi (bulan)</label>
-                                <select name="durasi_bulan" class="border rounded p-2 text-sm w-40">
-                                    <option value="">-- pilih --</option>
-                                    @for ($i=1; $i<=6; $i++)
-                                        <option value="{{ $i }}" {{ old('durasi_bulan', $pendaftaran->durasi_bulan) == $i ? 'selected' : '' }}>{{ $i }} bulan</option>
-                                    @endfor
-                                </select>
-                            </div>
-
-                            {{-- Input tanggal --}}
-                            <div id="tanggal-wrapper" class="{{ old('tipe_periode', $pendaftaran->tipe_periode) === 'tanggal' ? '' : 'hidden' }}">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-gray-700 mb-1">Tanggal Mulai <span class="text-red-500">*</span></label>
+                                    <input type="date" name="tanggal_mulai"
+                                           value="{{ old('tanggal_mulai', $pendaftaran->tanggal_mulai) }}"
+                                           class="border rounded p-2 text-sm w-full" required>
+                                </div>
                                     <div>
-                                        <label class="block text-xs text-gray-700 mb-1">Tanggal Mulai</label>
-                                        <input type="date" name="tanggal_mulai"
-                                               value="{{ old('tanggal_mulai', $pendaftaran->tanggal_mulai) }}"
-                                               class="border rounded p-2 text-sm w-full">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs text-gray-700 mb-1">Tanggal Selesai</label>
+                                        <label class="block text-sm text-gray-700 mb-1">Tanggal Selesai <span class="text-red-500">*</span></label>
                                         <input type="date" name="tanggal_selesai"
                                                value="{{ old('tanggal_selesai', $pendaftaran->tanggal_selesai) }}"
-                                               class="border rounded p-2 text-sm w-full">
+                                               class="border rounded p-2 text-sm w-full" required>
                                     </div>
                                 </div>
                             </div>

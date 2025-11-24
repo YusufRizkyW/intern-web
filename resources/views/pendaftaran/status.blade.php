@@ -132,21 +132,15 @@
                                 {{-- Periode --}}
                                 <div class="border rounded p-4 bg-gray-50">
                                     <div class="text-xs text-gray-500 mb-1">Periode Magang</div>
-                                    @if ($pendaftaran->tipe_periode === 'durasi')
-                                        <div class="text-sm font-medium text-gray-800">
-                                            {{ $pendaftaran->durasi_bulan }} bulan
-                                        </div>
-                                    @else
-                                        <div class="text-sm font-medium text-gray-800">
-                                            @if ($pendaftaran->tanggal_mulai && $pendaftaran->tanggal_selesai)
-                                                {{ \Carbon\Carbon::parse($pendaftaran->tanggal_mulai)->format('d M Y') }}
-                                                –
-                                                {{ \Carbon\Carbon::parse($pendaftaran->tanggal_selesai)->format('d M Y') }}
-                                            @else
-                                                -
-                                            @endif
-                                        </div>
-                                    @endif
+                                    <div class="text-sm font-medium text-gray-800">
+                                        @if ($pendaftaran->tanggal_mulai && $pendaftaran->tanggal_selesai)
+                                            {{ \Carbon\Carbon::parse($pendaftaran->tanggal_mulai)->format('d M Y') }}
+                                            –
+                                            {{ \Carbon\Carbon::parse($pendaftaran->tanggal_selesai)->format('d M Y') }}
+                                        @else
+                                            -
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>

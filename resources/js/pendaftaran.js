@@ -7,10 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const anggotaList = document.getElementById('anggota_list');
     const addBtn = document.getElementById('add_member');
 
-    const radioDurasi = document.querySelector('input[name="tipe_periode"][value="durasi"]');
-    const radioTanggal = document.querySelector('input[name="tipe_periode"][value="tanggal"]');
-    const durasiWrap = document.getElementById('durasi-wrapper');
-    const tanggalWrap = document.getElementById('tanggal-wrapper');
+    // Periode logic removed - now only using tanggal
 
     let count = typeof initialCount !== 'undefined' ? initialCount : 1;
 
@@ -95,17 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // periode toggle
-    if (radioDurasi && radioTanggal) {
-        radioDurasi.addEventListener('change', () => {
-            durasiWrap.style.display = '';
-            tanggalWrap.style.display = 'none';
-        });
-        radioTanggal.addEventListener('change', () => {
-            durasiWrap.style.display = 'none';
-            tanggalWrap.style.display = '';
-        });
-    }
+    // periode toggle removed - now only using tanggal
 
     // debug listener for submit (optional)
     const form = document.querySelector('form[method="POST"]');

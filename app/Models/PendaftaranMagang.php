@@ -23,8 +23,6 @@ class PendaftaranMagang extends Model
         'link_drive',
         'catatan_admin',
         'status_verifikasi',
-        'tipe_periode',
-        'durasi_bulan',
         'tanggal_mulai',
         'tanggal_selesai',
     ];

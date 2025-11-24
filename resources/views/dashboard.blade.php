@@ -41,7 +41,7 @@
                 <div class="p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                     <div class="space-y-2">
                         <h1 class="text-2xl font-bold text-gray-800">
-                            Selamat datang di Portal Magang
+                            Selamat datang di Portal e-Magang
                         </h1>
                         <p class="text-sm text-gray-600">
                             Di sini kamu bisa mengajukan pendaftaran magang, memantau status pendaftaran,
