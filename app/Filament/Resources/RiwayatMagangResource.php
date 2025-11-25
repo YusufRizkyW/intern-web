@@ -228,9 +228,10 @@ class RiwayatMagangResource extends Resource
                 // Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            // ->bulkActions([
+            //     Tables\Actions\DeleteBulkAction::make(),
+            // ])
+            ;
     }
 
     public static function getPages(): array

@@ -30,18 +30,18 @@ class PendaftaranMagangController extends Controller
             $request->validate([
                 'nama_lengkap' => 'required|string|max:255',
                 'agency'       => 'required|string|max:255',
-                'nim'          => 'nullable|string|max:50',
-                'email'        => 'nullable|email|max:255',
-                'no_hp'        => 'nullable|string|max:30',
+                'nim'          => 'required|string|max:50',
+                'email'        => 'required|email|max:255',
+                'no_hp'        => 'required|string|max:30',
             ]);
         } else {
             // tim / rombongan
             $request->validate([
                 'anggota'        => 'required|array|min:1',
                 'anggota.0.nama' => 'required|string|max:255', // ketua
-                'anggota.*.nim'  => 'nullable|string|max:50',
-                'anggota.*.email'=> 'nullable|email|max:255',
-                'anggota.*.no_hp'=> 'nullable|string|max:30',
+                'anggota.*.nim'  => 'required|string|max:50',
+                'anggota.*.email'=> 'required|email|max:255',
+                'anggota.*.no_hp'=> 'required|string|max:30',
             ]);
         }
 
@@ -188,7 +188,7 @@ class PendaftaranMagangController extends Controller
         if ($request->tipe_pendaftaran === 'individu') {
             $request->validate([
                 'nama_lengkap' => 'required|string|max:255',
-                'nim'          => 'nullable|string|max:50',
+                'nim'          => 'required|string|max:50',
                 'email'        => 'required|email|max:255',
                 'no_hp'        => 'required|string|max:20',
             ]);
@@ -196,9 +196,9 @@ class PendaftaranMagangController extends Controller
             $request->validate([
                 'anggota'                    => 'required|array|min:1',
                 'anggota.*.nama'             => 'required|string|max:255',
-                'anggota.*.nim'              => 'nullable|string|max:50',
-                'anggota.*.email'            => 'nullable|email|max:255',
-                'anggota.*.no_hp'            => 'nullable|string|max:20',
+                'anggota.*.nim'              => 'required|string|max:50',
+                'anggota.*.email'            => 'required|email|max:255',
+                'anggota.*.no_hp'            => 'required|string|max:20',
             ]);
         }
 

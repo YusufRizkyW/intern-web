@@ -75,11 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="text" name="anggota[${count}][nama]" placeholder="Nama Lengkap"
                            class="w-full border rounded p-2 text-sm" required>
                     <input type="text" name="anggota[${count}][nim]" placeholder="NIM / NIS"
-                           class="w-full border rounded p-2 text-sm">
+                           class="w-full border rounded p-2 text-sm" required>
                     <input type="email" name="anggota[${count}][email]" placeholder="Email"
-                           class="w-full border rounded p-2 text-sm">
+                           class="w-full border rounded p-2 text-sm" required>
                     <input type="text" name="anggota[${count}][no_hp]" placeholder="No HP"
-                           class="w-full border rounded p-2 text-sm">
+                           class="w-full border rounded p-2 text-sm" required>
                 </div>
             `);
             count++;

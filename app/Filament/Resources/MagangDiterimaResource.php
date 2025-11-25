@@ -190,9 +190,9 @@ class MagangDiterimaResource extends Resource
                         'tim'      => 'Tim',
                     ]),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+            // ->actions([
+            //     Tables\Actions\EditAction::make(),
+            // ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);

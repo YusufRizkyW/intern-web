@@ -226,9 +226,9 @@ class PendaftaranMagangResource extends Resource
                         'tim'      => 'Tim',
                     ]),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ])
+            // ->bulkActions([
+            //     Tables\Actions\DeleteBulkAction::make(),
+            // ])
             // ✅ PERFORMANCE OPTIMIZATIONS
             ->defaultPaginationPageOption(25) // Reduce dari 50 ke 25 untuk loading lebih cepat
             ->defaultSort('created_at', 'desc') // Default sort
