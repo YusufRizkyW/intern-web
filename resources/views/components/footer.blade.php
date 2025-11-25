@@ -60,7 +60,7 @@
 
   <div class="border-t border-[#174060]">
     <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="text-sm text-gray-300">Hak Cipta © {{ date('Y') }} Badan Pusat Statistik</div>
+      <div class="text-sm text-gray-300">Hak Cipta © {{ date('Y') }} BPS Kabupaten Gresik</div>
 
       <div class="flex items-center gap-3">
         {{-- Facebook --}}
