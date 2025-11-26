@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Carbon\Carbon;
+use App\Models\PendaftaranMagang;
+use App\Observers\PendaftaranMagangObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +29,9 @@ class AppServiceProvider extends ServiceProvider
 
          // Set locale untuk Carbon
         Carbon::setLocale('id');
+
+        PendaftaranMagang::observe(PendaftaranMagangObserver::class);
         
     }
+
 }
