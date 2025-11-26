@@ -35,6 +35,14 @@
                         </div>
                     @endif
 
+                    {{-- error global (mis. pendaftaran aktif) --}}
+                    {{-- @if ($errors->has('global'))
+                        <div class="mb-4 p-3 bg-yellow-100 text-yellow-800 rounded">
+                            {{ $errors->first('global') }}
+                        </div>
+                    @endif --}}
+
+
                     {{-- success --}}
                     @if (session('success'))
                         <div class="mb-4 p-3 bg-green-100 text-green-700 rounded text-sm">
