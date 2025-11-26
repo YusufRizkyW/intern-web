@@ -34,6 +34,7 @@ return [
         'endpoint' => env('FONNTE_ENDPOINT'),
         'token' => env('FONNTE_TOKEN'),
         'country' => env('FONNTE_DEFAULT_COUNTRY', '62'),
+        'admin_number' => env('FONNTE_ADMIN_NUMBER'),
     ],
 
 
