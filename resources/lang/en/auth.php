@@ -1,6 +1,6 @@
 <?php
 return [
-    'failed' => 'User tidak ditemukan.',
+    'failed' => 'Pengguna tidak ditemukan.',
     'password' => 'Sandi salah.',
     'throttle' => 'Kesalahan server.',
 ];

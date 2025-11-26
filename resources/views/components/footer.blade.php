@@ -12,7 +12,7 @@
       </div>
 
       <div class="text-sm text-gray-200 space-y-1">
-        <div>Badan Pusat Statistik Kabupaten Gresik (Statistics Gresik)</div>
+        <div>Badan Pusat Statistik Kabupaten Gresik</div>
         <div>Jl. Dr. Wahidin Sudirohusodo No. 364, Gresik</div>
         <div>Jawa Timur</div>
         <div>Telp: (62-31) 3954787</div>

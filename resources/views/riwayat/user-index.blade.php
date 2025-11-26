@@ -31,7 +31,7 @@
                             </svg>
                             <p class="text-sm font-medium">Belum ada riwayat magang.</p>
                             <p class="text-xs text-gray-500">
-                                Riwayat pendaftaran akan muncul di sini setelah periode magang kamu selesai atau dibatalkan.
+                                Riwayat pendaftaran akan muncul di sini setelah periode magang kamu selesai, dibatalkan, atau ditolak.
                             </p>
                         </div>
                     @else
@@ -79,7 +79,7 @@
                                                     {{ $pendaftaran?->agency ?? $item->instansi_asal ?? '-' }}
                                                 </div>
                                                 <div class="text-xs text-gray-500">
-                                                    {{ $pendaftaran?->tipe_pendaftaran === 'tim' ? 'Tim / Rombongan' : 'Individu' }}
+                                                    {{ $pendaftaran?->tipe_pendaftaran === 'tim' ? 'Tim' : 'Individu' }}
                                                 </div>
                                             </td>
 
