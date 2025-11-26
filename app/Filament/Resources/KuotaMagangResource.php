@@ -239,39 +239,39 @@ class KuotaMagangResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Status Aktif'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->before(function ($record) {
-                        // Cek apakah ada kuota terisi sebelum delete
-                        if ($record->kuota_terisi > 0) {
-                            Notification::make()
-                                ->title('Tidak dapat menghapus!')
-                                ->body("Masih ada {$record->kuota_terisi} peserta terdaftar untuk periode ini.")
-                                ->danger()
-                                ->send();
+            // ->actions([s
+            //     Tables\Actions\EditAction::make(),
+            //     Tables\Actions\DeleteAction::make()
+            //         ->before(function ($record) {
+            //             // Cek apakah ada kuota terisi sebelum delete
+            //             if ($record->kuota_terisi > 0) {
+            //                 Notification::make()
+            //                     ->title('Tidak dapat menghapus!')
+            //                     ->body("Masih ada {$record->kuota_terisi} peserta terdaftar untuk periode ini.")
+            //                     ->danger()
+            //                     ->send();
                                 
-                            return false; // Cancel delete
-                        }
-                    }),
-            ])
+            //                 return false; // Cancel delete
+            //             }
+            //         }),
+            // ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->before(function ($records) {
-                            foreach ($records as $record) {
-                                if ($record->kuota_terisi > 0) {
-                                    Notification::make()
-                                        ->title('Tidak dapat menghapus!')
-                                        ->body("Periode {$record->periode} masih memiliki {$record->kuota_terisi} peserta terdaftar.")
-                                        ->danger()
-                                        ->send();
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make()
+                //         ->before(function ($records) {
+                //             foreach ($records as $record) {
+                //                 if ($record->kuota_terisi > 0) {
+                //                     Notification::make()
+                //                         ->title('Tidak dapat menghapus!')
+                //                         ->body("Periode {$record->periode} masih memiliki {$record->kuota_terisi} peserta terdaftar.")
+                //                         ->danger()
+                //                         ->send();
                                         
-                                    return false; // Cancel bulk delete
-                                }
-                            }
-                        }),
-                ]),
+                //                     return false; // Cancel bulk delete
+                //                 }
+                //             }
+                //         }),
+                // ]),
             ]);
     }
 

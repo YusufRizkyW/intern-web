@@ -110,7 +110,7 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')" class="text-white hover:text-gray-200 hover:bg-white/10">
-                    {{ __('Profile') }}
+                    {{ __('Profil') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
@@ -121,7 +121,7 @@
                             onclick="event.preventDefault();
                                         this.closest('form').submit();"
                             class="text-white hover:text-gray-200 hover:bg-white/10">
-                        {{ __('Log Out') }}
+                        {{ __('Keluar') }}
                     </x-responsive-nav-link>
                 </form>
             </div>

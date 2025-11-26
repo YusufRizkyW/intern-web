@@ -80,7 +80,7 @@
                                 <label class="block text-sm text-gray-700">Nama Lengkap Peserta <span class="text-red-500">*</span></label>
                                 <input type="text" name="nama_lengkap"
                                     value="{{ old('nama_lengkap') }}"
-                                    class="w-full border rounded p-2 text-sm">
+                                    class="w-full border rounded p-2 text-sm" required>
                             </div>
                             {{-- <div>
                                 <label class="block text-sm text-gray-700">Asal / Instansi / Kampus <span class="text-red-500">*</span></label>
@@ -92,19 +92,19 @@
                                 <label class="block text-sm text-gray-700">NIM / NIS <span class="text-red-500">*</span></label>
                                 <input type="text" name="nim"
                                     value="{{ old('nim') }}"
-                                    class="w-full border rounded p-2 text-sm">
+                                    class="w-full border rounded p-2 text-sm" required>
                             </div>
                             <div>
                                 <label class="block text-sm text-gray-700">Email <span class="text-red-500">*</span></label>
                                 <input type="email" name="email"
                                     value="{{ old('email') }}"
-                                    class="w-full border rounded p-2 text-sm">
+                                    class="w-full border rounded p-2 text-sm" required>
                             </div>
                             <div>
                                 <label class="block text-sm text-gray-700">No HP <span class="text-red-500">*</span></label>
                                 <input type="text" name="no_hp"
                                     value="{{ old('no_hp') }}"
-                                    class="w-full border rounded p-2 text-sm">
+                                    class="w-full border rounded p-2 text-sm" required>
                             </div>
                             
                         </div>
@@ -142,16 +142,16 @@
                                                    class="w-full border rounded p-2 text-sm" {{ $i===0 ? 'required' : '' }}>
                                             <input type="text" name="anggota[{{ $i }}][nim]" placeholder="NIM / NIS"
                                                    value="{{ $row['nim'] ?? '' }}"
-                                                   class="w-full border rounded p-2 text-sm">
+                                                   class="w-full border rounded p-2 text-sm" {{ $i===0 ? 'required' : '' }}>
                                             {{-- <input type="text" name="anggota[{{ $i }}][agency]" placeholder="Asal / Instansi / Kampus"
                                                    value="{{ $row['agency'] ?? '' }}"
                                                    class="w-full border rounded p-2 text-sm"> --}}
                                             <input type="email" name="anggota[{{ $i }}][email]" placeholder="Email"
                                                    value="{{ $row['email'] ?? '' }}"
-                                                   class="w-full border rounded p-2 text-sm">
+                                                   class="w-full border rounded p-2 text-sm" {{ $i===0 ? 'required' : '' }}>
                                             <input type="text" name="anggota[{{ $i }}][no_hp]" placeholder="No HP"
                                                    value="{{ $row['no_hp'] ?? '' }}"
-                                                   class="w-full border rounded p-2 text-sm">
+                                                   class="w-full border rounded p-2 text-sm" {{ $i===0 ? 'required' : '' }}>
                                         </div>
                                     @endforeach
                                 @else
@@ -159,15 +159,15 @@
                                     <div class="border rounded p-3 bg-white space-y-2 mb-2">
                                         <div class="text-xs font-semibold text-gray-600">Peserta 1 (Ketua)</div>
                                         <input type="text" name="anggota[0][nama]" placeholder="Nama Lengkap"
-                                               class="w-full border rounded p-2 text-sm">
+                                               class="w-full border rounded p-2 text-sm" required>
                                         {{-- <input type="text" name="anggota[0][agency]" placeholder="Asal / Instansi / Kampus"
                                                class="w-full border rounded p-2 text-sm"> --}}
                                         <input type="text" name="anggota[0][nim]" placeholder="NIM / NIS"
-                                               class="w-full border rounded p-2 text-sm">
+                                               class="w-full border rounded p-2 text-sm" required>
                                         <input type="email" name="anggota[0][email]" placeholder="Email"
-                                               class="w-full border rounded p-2 text-sm">
+                                               class="w-full border rounded p-2 text-sm" required>
                                         <input type="text" name="anggota[0][no_hp]" placeholder="No HP"
-                                               class="w-full border rounded p-2 text-sm">
+                                               class="w-full border rounded p-2 text-sm" required>
                                     </div>
                                 @endif
                             </div>
