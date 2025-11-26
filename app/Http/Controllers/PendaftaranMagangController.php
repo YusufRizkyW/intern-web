@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\PendaftaranMagang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Services\WhatsAppService;
 
 class PendaftaranMagangController extends Controller
 {
@@ -13,9 +15,11 @@ class PendaftaranMagangController extends Controller
         return view('pendaftaran.create');
     }
 
-    public function store(Request $request)
+    /**
+     * Store pendaftaran dan notify admin via WhatsApp (Fonnte)
+     */
+    public function store(Request $request, WhatsAppService $whatsapp)
     {
-        // dd($request->all());
         // 1. VALIDASI UMUM (selalu wajib)
         $request->validate([
             'tipe_pendaftaran' => 'required|in:individu,tim',
@@ -51,7 +55,6 @@ class PendaftaranMagangController extends Controller
 
         DB::beginTransaction();
         try {
-
             // 4. SIMPAN DATA
             if ($request->tipe_pendaftaran === 'individu') {
 
@@ -79,46 +82,36 @@ class PendaftaranMagangController extends Controller
 
             } else {
                 // TIPE TIM
-                // bersihkan anggota kosong
                 $anggota = collect($request->anggota)
                     ->filter(fn($row) => !empty($row['nama']))
                     ->values();
 
-                // pastikan masih ada minimal 1
                 if ($anggota->isEmpty()) {
                     return back()
                         ->withErrors(['anggota.0.nama' => 'Minimal 1 anggota harus diisi.'])
                         ->withInput();
                 }
 
-                // simpan pendaftaran utama pakai anggota pertama sebagai ketua
                 $pendaftaran = PendaftaranMagang::create([
                     'user_id'           => auth()->id(),
                     'tipe_pendaftaran'  => 'tim',
 
-                    // pakai ketua
                     'nama_lengkap'      => $anggota[0]['nama'],
                     'agency'            => $request->agency,
                     'nim'               => $anggota[0]['nim'] ?? null,
                     'email'             => $anggota[0]['email'] ?? null,
                     'no_hp'             => $anggota[0]['no_hp'] ?? null,
 
-                    // berkas
                     'link_drive'        => $request->link_drive,
-
-                    // periode
                     'tanggal_mulai'     => $tanggalMulai,
                     'tanggal_selesai'   => $tanggalSelesai,
-
-                    // status awal
                     'status_verifikasi' => 'pending',
                 ]);
 
-                // simpan anggota lain ke tabel relasi
                 foreach ($anggota as $i => $member) {
                     $pendaftaran->members()->create([
                         'nama_anggota'    => $member['nama'] ?? null,
-                        'agency_anggota'  => $request->agency,           // satu asal untuk tim
+                        'agency_anggota'  => $request->agency,
                         'nim_anggota'     => $member['nim'] ?? null,
                         'email_anggota'   => $member['email'] ?? null,
                         'no_hp_anggota'   => $member['no_hp'] ?? null,
@@ -126,14 +119,59 @@ class PendaftaranMagangController extends Controller
                     ]);
                 }
 
-
-                // kalau kamu mau simpan jumlah_anggota di pendaftarannya:
                 $pendaftaran->update([
                     'jumlah_anggota' => $anggota->count(),
                 ]);
             }
 
             DB::commit();
+
+            // -------------------------
+            // Kirim notifikasi WA ke admin
+            // -------------------------
+            $adminNumber = config('services.fonnte.admin_number');
+
+            if ($adminNumber) {
+                // Buat pesan singkat untuk admin
+                if ($pendaftaran->tipe_pendaftaran === 'individu') {
+                    $msg = "🔔 *Pendaftaran Peserta Magang/PKL Baru*\n"
+                         . "Nama: {$pendaftaran->nama_lengkap}\n"
+                         . "Instansi: {$pendaftaran->agency}\n"
+                         . "Email: {$pendaftaran->email}\n"
+                         . "No HP: {$pendaftaran->no_hp}\n"
+                         . "Link berkas: {$pendaftaran->link_drive}\n"
+                         . "Lihat admin panel untuk detail.";
+                } else {
+                    $msg = "🔔 *Pendaftaran Tim Peserta Magang/PKL Baru*\n"
+                         . "Ketua: {$pendaftaran->nama_lengkap}\n"
+                         . "Instansi: {$pendaftaran->agency}\n"
+                         . "Jumlah anggota: {$pendaftaran->jumlah_anggota}\n"
+                         . "Link berkas: {$pendaftaran->link_drive}\n"
+                         . "Lihat admin panel untuk detail.";
+                }
+
+                try {
+                    $waResp = $whatsapp->send($adminNumber, $msg);
+
+                    // Log hasil response (penting untuk debugging token/limit)
+                    Log::info('NotifyAdminNewPendaftaran', [
+                        'pendaftaran_id' => $pendaftaran->id,
+                        'admin_number'   => $adminNumber,
+                        'wa_response'    => $waResp,
+                    ]);
+                } catch (\Throwable $e) {
+                    // Jangan gagalkan proses pendaftaran kalau notif WA gagal
+                    Log::error('NotifyAdminNewPendaftaran: exception', [
+                        'pendaftaran_id' => $pendaftaran->id,
+                        'exception'      => $e->getMessage(),
+                    ]);
+                }
+            } else {
+                Log::warning('FONNTE_ADMIN_NUMBER not configured; admin not notified via WA', [
+                    'pendaftaran_id' => $pendaftaran->id,
+                ]);
+            }
+
             return back()->with('success', 'Pendaftaran berhasil dikirim. Silakan tunggu verifikasi admin.');
 
         } catch (\Exception $e) {
@@ -144,14 +182,14 @@ class PendaftaranMagangController extends Controller
         }
     }
 
+    // ... sisanya (edit, update, destroy) tetap seperti sebelumnya
     public function edit(PendaftaranMagang $pendaftaran)
     {
-        // Cek apakah pendaftaran milik user yang login
+        // cek ownership dan status seperti sebelumnya
         if ($pendaftaran->user_id !== auth()->id()) {
             abort(403, 'Unauthorized');
         }
 
-        // Cek apakah status masih pending
         if (!in_array($pendaftaran->status_verifikasi, ['pending', 'revisi'], true)) {
             return redirect()
                 ->route('pendaftaran.status')

@@ -50,7 +50,7 @@ class WhatsAppService
         $payload = array_merge([
             'target' => $targetClean,
             'message' => $message,
-            // 'delay' => '5-10', // contoh kalau mau delay
+            'delay' => '5-10', // contoh kalau mau delay
             'countryCode' => $this->defaultCountry,
         ], $opts);
 

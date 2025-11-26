@@ -60,7 +60,16 @@
 
   <div class="border-t border-[#174060]">
     <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="text-sm text-gray-300">Hak Cipta © {{ date('Y') }} BPS Kabupaten Gresik</div>
+      <div class="flex items-center gap-3">
+        <div class="text-sm text-gray-300">Hak Cipta © {{ date('Y') }} BPS Kabupaten Gresik</div>
+        <a href="{{ url('/admin') }}" 
+           class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs transition-colors flex items-center gap-1">
+          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1L9 7V9C9 10.1 9.9 11 11 11V22H13V11C14.1 11 15 10.1 15 9H21Z"/>
+          </svg>
+          Login Admin
+        </a>
+      </div>
 
       <div class="flex items-center gap-3">
         {{-- Facebook --}}
