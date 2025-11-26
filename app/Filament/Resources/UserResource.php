@@ -94,11 +94,12 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()->visible(fn ($record) => $record->id !== auth()->id()),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                // Tables\Actions\DeleteAction::make()->visible(fn ($record) => $record->id !== auth()->id()),
             ]);
+            // ->bulkActions([
+            //     Tables\Actions\DeleteBulkAction::make(),
+            // ])
+
     }
 
     public static function getPages(): array

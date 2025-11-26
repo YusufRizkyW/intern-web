@@ -142,16 +142,16 @@
                                                    class="w-full border rounded p-2 text-sm" {{ $i===0 ? 'required' : '' }}>
                                             <input type="text" name="anggota[{{ $i }}][nim]" placeholder="NIM / NIS"
                                                    value="{{ $row['nim'] ?? '' }}"
-                                                   class="w-full border rounded p-2 text-sm">
+                                                   class="w-full border rounded p-2 text-sm" {{ $i===0 ? 'required' : '' }}>
                                             {{-- <input type="text" name="anggota[{{ $i }}][agency]" placeholder="Asal / Instansi / Kampus"
                                                    value="{{ $row['agency'] ?? '' }}"
                                                    class="w-full border rounded p-2 text-sm"> --}}
                                             <input type="email" name="anggota[{{ $i }}][email]" placeholder="Email"
                                                    value="{{ $row['email'] ?? '' }}"
-                                                   class="w-full border rounded p-2 text-sm">
+                                                   class="w-full border rounded p-2 text-sm" {{ $i===0 ? 'required' : '' }}>
                                             <input type="text" name="anggota[{{ $i }}][no_hp]" placeholder="No HP"
                                                    value="{{ $row['no_hp'] ?? '' }}"
-                                                   class="w-full border rounded p-2 text-sm">
+                                                   class="w-full border rounded p-2 text-sm" {{ $i===0 ? 'required' : '' }}>
                                         </div>
                                     @endforeach
                                 @else
