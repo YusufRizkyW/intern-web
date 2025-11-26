@@ -30,5 +30,11 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'fonnte' => [
+        'endpoint' => env('FONNTE_ENDPOINT'),
+        'token' => env('FONNTE_TOKEN'),
+        'country' => env('FONNTE_DEFAULT_COUNTRY', '62'),
+    ],
+
 
 ];

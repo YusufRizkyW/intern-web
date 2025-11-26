@@ -191,13 +191,13 @@ class MagangAktifResource extends Resource
                         'individu' => 'Individu',
                         'tim'      => 'Tim',
                     ]),
-            ])
+                ]);
             // ->actions([
             //     Tables\Actions\EditAction::make(),
-            // ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            // ]);
+            // ->bulkActions([
+            //     Tables\Actions\DeleteBulkAction::make(),
+            // ]);
     }
 
 
