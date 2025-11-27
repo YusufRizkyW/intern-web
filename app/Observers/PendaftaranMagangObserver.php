@@ -28,7 +28,7 @@ class PendaftaranMagangObserver
             $new = $pendaftaran->status_verifikasi;
 
             // only send for specific statuses
-            $allowed = ['revisi', 'diterima', 'ditolak', 'aktif', 'selesai'];
+            $allowed = ['revisi', 'diterima', 'ditolak', 'aktif', 'selesai', 'batal'];
 
             if (in_array($new, $allowed, true)) {
                 // Format pesan sesuai status
@@ -66,6 +66,8 @@ class PendaftaranMagangObserver
                 return $base . "\nStatus: *Sedang Magang (Aktif)*\nInformasi lebih lanjut silahkan cek *Status Pendaftaran* atau WA.";
             case 'selesai':
                 return $base . "\nStatus: *Selesai*\nTerima kasih sudah melaksanakan magang. Semoga pengalaman bermanfaat!";
+            case 'batal':
+                return $base . "\nStatus: *Dibatalkan*\nPendaftaran magang Anda telah dibatalkan. Alasan: " . ($p->catatan_admin ?? 'Tidak ada keterangan.');
             default:
                 return $base . "\nStatus: {$newStatus}";
         }

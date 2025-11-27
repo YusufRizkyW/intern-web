@@ -87,25 +87,27 @@
                                     <label class="block text-xs text-gray-700 mb-1">Nama Lengkap</label>
                                     <input type="text" name="nama_lengkap" 
                                            value="{{ old('nama_lengkap', $pendaftaran->nama_lengkap) }}"
-                                           class="w-full border rounded p-2 text-sm">
+                                           class="w-full border rounded p-2 text-sm" required>
                                 </div>
                                 <div>
                                     <label class="block text-xs text-gray-700 mb-1">NIM / NIS</label>
                                     <input type="text" name="nim" 
                                            value="{{ old('nim', $pendaftaran->nim) }}"
-                                           class="w-full border rounded p-2 text-sm">
+                                           class="w-full border rounded p-2 text-sm" required>
                                 </div>
                                 <div>
                                     <label class="block text-xs text-gray-700 mb-1">Email</label>
                                     <input type="email" name="email" 
                                            value="{{ old('email', $pendaftaran->email) }}"
-                                           class="w-full border rounded p-2 text-sm">
+                                           class="w-full border rounded p-2 text-sm" required>
                                 </div>
                                 <div>
                                     <label class="block text-xs text-gray-700 mb-1">No HP / WA</label>
                                     <input type="text" name="no_hp" 
                                            value="{{ old('no_hp', $pendaftaran->no_hp) }}"
-                                           class="w-full border rounded p-2 text-sm">
+                                           class="w-full border rounded p-2 text-sm" 
+                                           placeholder="Contoh: 085712345678"
+                                           required>
                                 </div>
                                 {{-- <div class="md:col-span-2">
                                     <label class="block text-xs text-gray-700 mb-1">Instansi / Asal</label>
@@ -125,13 +127,6 @@
                                     + Tambah Anggota
                                 </button>
                             </div>
-                            
-                            {{-- <div class="md:col-span-2 mb-4">
-                                <label class="block text-xs text-gray-700 mb-1">Instansi / Asal</label>
-                                <input type="text" name="agency" 
-                                       value="{{ old('agency', $pendaftaran->agency) }}"
-                                       class="w-full border rounded p-2 text-sm">
-                            </div> --}}
 
                             <div id="anggota_list" class="space-y-3">
                                 @php
@@ -150,13 +145,15 @@
                                                class="w-full border rounded p-2 text-sm" required>
                                         <input type="text" name="anggota[{{ $index }}][nim]" placeholder="NIM / NIS"
                                                value="{{ $member['nim_anggota'] ?? $member['nim'] ?? '' }}"
-                                               class="w-full border rounded p-2 text-sm">
+                                               class="w-full border rounded p-2 text-sm" required>
                                         <input type="email" name="anggota[{{ $index }}][email]" placeholder="Email"
                                                value="{{ $member['email_anggota'] ?? $member['email'] ?? '' }}"
-                                               class="w-full border rounded p-2 text-sm">
+                                               class="w-full border rounded p-2 text-sm" required>
                                         <input type="text" name="anggota[{{ $index }}][no_hp]" placeholder="No HP"
                                                value="{{ $member['no_hp_anggota'] ?? $member['no_hp'] ?? '' }}"
-                                               class="w-full border rounded p-2 text-sm">
+                                               class="w-full border rounded p-2 text-sm"
+                                               placeholder="Contoh: 085712345678"
+                                               required>
                                     </div>
                                 @endforeach
                             </div>
@@ -193,7 +190,7 @@
                             <input type="url" name="link_drive" 
                                    value="{{ old('link_drive', $pendaftaran->link_drive) }}"
                                    placeholder="https://drive.google.com/drive/folders/..."
-                                   class="w-full border rounded p-2 text-sm">
+                                   class="w-full border rounded p-2 text-sm" required>
                         </div>
 
                         {{-- Submit Button --}}
