@@ -18,14 +18,32 @@ class WhatsAppService
     }
 
     /**
-     * Kirim pesan WA.
+     * Kirim pesan WA ke satu nomor atau beberapa nomor.
      *
-     * @param string $target Nomor tujuan (bisa tanpa kode negara)
+     * @param string|array $target Nomor tujuan (string) atau array of nomor.
      * @param string $message Isi pesan
      * @param array $opts Optional: delay, countryCode, dll
-     * @return array|null Response array on success, null on failure
+     * @return array|null Jika kirim ke banyak nomor -> array hasil per nomor. Jika single -> response array|null
      */
-    public function send(string $target, string $message, array $opts = []): ?array
+    public function send(string|array $target, string $message, array $opts = []): ?array
+    {
+        // jika array, kirim satu-per-satu dan koleksi hasil
+        if (is_array($target)) {
+            $results = [];
+            foreach ($target as $t) {
+                $results[] = $this->sendSingle(trim($t), $message, $opts);
+            }
+            return $results;
+        }
+
+        // single
+        return $this->sendSingle($target, $message, $opts);
+    }
+
+    /**
+     * Kirim ke single nomor, internal.
+     */
+    protected function sendSingle(string $target, string $message, array $opts = []): ?array
     {
         // normalize nomor: hanya digit
         $targetClean = preg_replace('/\D+/', '', $target);
@@ -35,22 +53,22 @@ class WhatsAppService
             return null;
         }
 
-        // if no country code, prepend default
-        if (!preg_match('/^(\+)?[1-9][0-9]{6,}$/', $targetClean)) {
-            // If length suggests local number (e.g. starts with 8 for Indonesia), prepend country
-            if (substr($targetClean, 0, 1) === '0') {
-                $targetClean = ltrim($targetClean, '0');
-            }
-            // if still looks local (e.g. 8xxx...), add country
-            if (strlen($targetClean) <= 12 && strlen($this->defaultCountry) > 0 && strpos($targetClean, $this->defaultCountry) !== 0) {
-                $targetClean = $this->defaultCountry . $targetClean;
-            }
+        // Jika mulai dengan '0', hapus nol dan tambahkan country code nanti
+        if (substr($targetClean, 0, 1) === '0') {
+            $targetClean = ltrim($targetClean, '0');
+        }
+
+        // Tambahkan default country jika belum ada
+        if ($this->defaultCountry && strpos($targetClean, $this->defaultCountry) !== 0) {
+            // jika nomor sangat panjang dan sudah punya country, biarkan
+            $targetClean = $this->defaultCountry . $targetClean;
         }
 
         $payload = array_merge([
             'target' => $targetClean,
             'message' => $message,
-            'delay' => '5-10', // contoh kalau mau delay
+            // default delay, bisa ditimpa oleh $opts
+            'delay' => '5-10',
             'countryCode' => $this->defaultCountry,
         ], $opts);
 

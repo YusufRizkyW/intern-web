@@ -144,43 +144,56 @@ class PendaftaranMagangController extends Controller
 
             DB::commit();
 
+            // Kirim notifikasi WA ke admin (bisa beberapa nomor, dipisah koma di .env)
             // -------------------------
-            // Kirim notifikasi WA ke admin
-            // -------------------------
-            $adminNumber = config('services.fonnte.admin_number');
-            if ($adminNumber) {
-                // Buat pesan singkat untuk admin
-                if ($pendaftaran->tipe_pendaftaran === 'individu') {
-                    $msg = "🔔 *Pendaftaran Peserta Magang/PKL Baru*\n"
-                         . "Nama: {$pendaftaran->nama_lengkap}\n"
-                         . "Instansi: {$pendaftaran->agency}\n"
-                         . "Email: {$pendaftaran->email}\n"
-                         . "No HP: {$pendaftaran->no_hp}\n"
-                         . "Link berkas: {$pendaftaran->link_drive}\n"
-                         . "Lihat admin panel untuk detail.";
+            $adminRaw = config('services.fonnte.admin_number') ?? env('FONNTE_ADMIN_NUMBER');
+
+            if ($adminRaw) {
+                // parse menjadi array, dukung pemisah koma atau titik koma
+                $adminNumbers = collect(preg_split('/[,;]+/', $adminRaw))
+                    ->map(fn($n) => trim($n))
+                    ->filter(fn($n) => $n !== '')
+                    ->values()
+                    ->all();
+
+                if (!empty($adminNumbers)) {
+                    // buat pesan singkat
+                    if ($pendaftaran->tipe_pendaftaran === 'individu') {
+                        $msg = "🔔 *Pendaftaran Peserta Magang/PKL Baru*\n"
+                            . "Nama: {$pendaftaran->nama_lengkap}\n"
+                            . "Instansi: {$pendaftaran->agency}\n"
+                            . "Email: {$pendaftaran->email}\n"
+                            . "No HP: {$pendaftaran->no_hp}\n"
+                            . "Link berkas: {$pendaftaran->link_drive}\n"
+                            . "Lihat admin panel untuk detail.";
+                    } else {
+                        $msg = "🔔 *Pendaftaran Tim Peserta Magang/PKL Baru*\n"
+                            . "Ketua: {$pendaftaran->nama_lengkap}\n"
+                            . "Instansi: {$pendaftaran->agency}\n"
+                            . "Jumlah anggota: {$pendaftaran->jumlah_anggota}\n"
+                            . "Link berkas: {$pendaftaran->link_drive}\n"
+                            . "Lihat admin panel untuk detail.";
+                    }
+
+                    try {
+                        // whatsapp->send menerima array, sehingga akan mengirim ke tiap nomor
+                        $waResp = $whatsapp->send($adminNumbers, $msg);
+
+                        Log::info('NotifyAdminNewPendaftaran', [
+                            'pendaftaran_id' => $pendaftaran->id,
+                            'admin_numbers'  => $adminNumbers,
+                            'wa_response'    => $waResp,
+                        ]);
+                    } catch (\Throwable $e) {
+                        Log::error('NotifyAdminNewPendaftaran: exception', [
+                            'pendaftaran_id' => $pendaftaran->id,
+                            'exception'      => $e->getMessage(),
+                        ]);
+                    }
                 } else {
-                    $msg = "🔔 *Pendaftaran Tim Peserta Magang/PKL Baru*\n"
-                         . "Ketua: {$pendaftaran->nama_lengkap}\n"
-                         . "Instansi: {$pendaftaran->agency}\n"
-                         . "Jumlah anggota: {$pendaftaran->jumlah_anggota}\n"
-                         . "Link berkas: {$pendaftaran->link_drive}\n"
-                         . "Lihat admin panel untuk detail.";
-                }
-
-                try {
-                    $waResp = $whatsapp->send($adminNumber, $msg);
-
-                    // Log hasil response (penting untuk debugging token/limit)
-                    Log::info('NotifyAdminNewPendaftaran', [
+                    Log::warning('FONNTE_ADMIN_NUMBER configured but no valid numbers parsed', [
+                        'raw' => $adminRaw,
                         'pendaftaran_id' => $pendaftaran->id,
-                        'admin_number'   => $adminNumber,
-                        'wa_response'    => $waResp,
-                    ]);
-                } catch (\Throwable $e) {
-                    // Jangan gagalkan proses pendaftaran kalau notif WA gagal
-                    Log::error('NotifyAdminNewPendaftaran: exception', [
-                        'pendaftaran_id' => $pendaftaran->id,
-                        'exception'      => $e->getMessage(),
                     ]);
                 }
             } else {
@@ -188,6 +201,7 @@ class PendaftaranMagangController extends Controller
                     'pendaftaran_id' => $pendaftaran->id,
                 ]);
             }
+
 
             return back()->with('success', 'Pendaftaran berhasil dikirim. Silakan tunggu verifikasi admin.');
 
