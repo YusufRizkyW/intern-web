@@ -112,7 +112,9 @@
                                 <label class="block text-sm text-gray-700">No HP <span class="text-red-500">*</span></label>
                                 <input type="text" name="no_hp"
                                     value="{{ old('no_hp') }}"
-                                    class="w-full border rounded p-2 text-sm" required>
+                                    class="w-full border rounded p-2 text-sm" 
+                                    placeholder="Contoh: 085712345678"
+                                    required>
                             </div>
                             
                         </div>
