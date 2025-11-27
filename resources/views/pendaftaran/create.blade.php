@@ -65,7 +65,7 @@
                                 <option value="tim" {{ old('tipe_pendaftaran') === 'tim' ? 'selected' : '' }}>Tim</option>
                             </select>
                             <p class="text-xs text-gray-500">
-                                Pilih <b>Tim</b> kalau Anda mewakili sekolah dan ingin mendaftarkan beberapa siswa sekaligus.
+                                Pilih <b>Tim</b> kalau Anda Magang/PKL Berkelompok.
                             </p>
                         </div>
 
@@ -115,6 +115,9 @@
                                     class="w-full border rounded p-2 text-sm" 
                                     placeholder="Contoh: 085712345678"
                                     required>
+                                <p class="text-xs text-gray-500">
+                                Anda akan mendapatkan pesan WhatsApp jika status pendaftaran anda berubah.
+                                </p>
                             </div>
                             
                         </div>
@@ -178,6 +181,9 @@
                                                class="w-full border rounded p-2 text-sm" required>
                                         <input type="text" name="anggota[0][no_hp]" placeholder="No HP"
                                                class="w-full border rounded p-2 text-sm" required>
+                                    <p class="text-xs text-gray-500">
+                                        Anda akan mendapatkan pesan WhatsApp jika status pendaftaran anda berubah.
+                                    </p>
                                     </div>
                                 @endif
                             </div>
