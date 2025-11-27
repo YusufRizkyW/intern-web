@@ -13,7 +13,13 @@ class ListRiwayatMagangs extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            //Actions\CreateAction::make(),
+            Actions\Action::make('info')
+                ->label('Seluruh riwayat pendaftaran akan tersimpan disini')
+                ->disabled()
+                ->view('components.info-filament')
+                ->viewData([
+                    'message' => '💡 Tip: Seluruh riwayat pendaftaran akan tersimpan disini'
+                ]),
         ];
     }
 }

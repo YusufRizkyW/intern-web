@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\KuotaMagangResource\Pages;
 
 use App\Filament\Resources\KuotaMagangResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
 
 class ListKuotaMagangs extends ListRecords
 {
@@ -13,7 +13,21 @@ class ListKuotaMagangs extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            //Actions\CreateAction::make(),
+
+            // Info message sebagai disabled action
+            Actions\Action::make('info')
+                ->label('💡 Tip: Buat kuota magang sebelum menerima pendaftar')
+                ->disabled()
+                ->view('components.info-filament')
+                ->viewData([
+                    'message' => '💡 Tip: Buat kuota magang sebelum menerima pendaftar'
+                ]),
+                
+            // Create button  
+            Actions\CreateAction::make()
+                ->label('Tambah Kuota')
+                ->icon('heroicon-o-plus')
+                ->color('success'),
         ];
     }
 }

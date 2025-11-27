@@ -13,7 +13,13 @@ class ListMagangDiterimas extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            //Actions\CreateAction::make(),
+            Actions\Action::make('info')
+                ->label('💡 Tip: Buat kuota magang sebelum menerima pendaftar')
+                ->disabled()
+                ->view('components.info-filament')
+                ->viewData([
+                    'message' => '💡 Tip: Seluruh pendaftar yang diterima akan berada disini'
+                ]),
         ];
     }
 }
