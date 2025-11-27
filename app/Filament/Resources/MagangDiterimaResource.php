@@ -203,8 +203,6 @@ class MagangDiterimaResource extends Resource
         return [
             MembersRelationManager::class,
             StatusLogsRelationManager::class,
-            // kalau nanti kamu bikin tabel berkas, tinggal tambah di sini
-            // BerkasPendaftaranRelationManager::class,
         ];
     }
 

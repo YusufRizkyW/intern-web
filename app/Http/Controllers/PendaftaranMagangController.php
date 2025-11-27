@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\WhatsAppService;
 
+
 class PendaftaranMagangController extends Controller
 {
     public function create()
@@ -20,6 +21,23 @@ class PendaftaranMagangController extends Controller
      */
     public function store(Request $request, WhatsAppService $whatsapp)
     {
+         $userId = auth()->id();
+
+        // SERVER-SIDE GUARD: Pastikan user tidak punya pendaftaran aktif
+        $existing = PendaftaranMagang::where('user_id', $userId)
+            ->whereIn('status_verifikasi', ['pending', 'revisi', 'diterima', 'aktif'])
+            ->first();
+
+        if ($existing) {
+            // kembalikan ke form dengan error informatif
+            return redirect()->back()
+                ->withInput()
+                ->withErrors([
+                    'global' => "Pendaftaran gagal: Anda masih memiliki pendaftaran aktif (status: {$existing->status_verifikasi}).
+                    Silakan cek halaman Status Pendaftaran"
+                ]);
+        }
+
         // 1. VALIDASI UMUM (selalu wajib)
         $request->validate([
             'tipe_pendaftaran' => 'required|in:individu,tim',
@@ -130,7 +148,6 @@ class PendaftaranMagangController extends Controller
             // Kirim notifikasi WA ke admin
             // -------------------------
             $adminNumber = config('services.fonnte.admin_number');
-
             if ($adminNumber) {
                 // Buat pesan singkat untuk admin
                 if ($pendaftaran->tipe_pendaftaran === 'individu') {
@@ -182,7 +199,7 @@ class PendaftaranMagangController extends Controller
         }
     }
 
-    // ... sisanya (edit, update, destroy) tetap seperti sebelumnya
+    // Edit pendaftaran
     public function edit(PendaftaranMagang $pendaftaran)
     {
         // cek ownership dan status seperti sebelumnya
@@ -199,6 +216,7 @@ class PendaftaranMagangController extends Controller
         return view('pendaftaran.edit', compact('pendaftaran'));
     }
 
+    // Update pendaftaran
     public function update(Request $request, PendaftaranMagang $pendaftaran)
     {
         // Cek apakah pendaftaran milik user yang login
@@ -292,9 +310,7 @@ class PendaftaranMagangController extends Controller
         }
     }
 
-    /**
-     * Batalkan pendaftaran (hanya untuk status pending)
-     */
+    // Hapus/Batalkan pendaftaran
     public function destroy(PendaftaranMagang $pendaftaran)
     {
         // Pastikan hanya user yang memiliki pendaftaran ini yang bisa membatalkan
@@ -335,5 +351,24 @@ class PendaftaranMagangController extends Controller
             return redirect()->route('pendaftaran.status')
                 ->with('error', 'Terjadi kesalahan saat membatalkan pendaftaran. Silakan coba lagi atau hubungi admin.');
         }
+    }
+
+    // Cek apakah user boleh mendaftar (tidak ada pendaftaran aktif)
+    public function checkActive(Request $request)
+    {
+        $userId = auth()->id();
+
+        $blocked = PendaftaranMagang::where('user_id', $userId)
+            ->whereIn('status_verifikasi', ['pending', 'revisi', 'diterima', 'aktif'])
+            ->exists();
+
+        if ($blocked) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Anda masih memiliki pendaftaran sebelumnya dengan status pending/revisi/diterima/aktif. Silakan tunggu hingga status berubah menjadi batal/ditolak/selesai/arsip sebelum mendaftar lagi.'
+            ], 200);
+        }
+
+        return response()->json(['ok' => true], 200);
     }
 }

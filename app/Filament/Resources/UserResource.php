@@ -90,7 +90,10 @@ class UserResource extends Resource
                     ->label('Dibuat'),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('role')->options([
+                    'admin' => 'Admin',
+                    'user' => 'User',
+                ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

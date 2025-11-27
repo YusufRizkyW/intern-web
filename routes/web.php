@@ -41,8 +41,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/riwayat-magang', [RiwayatMagangUserController::class, 'index'])
         ->name('riwayat.user.index');
 
-    
-    
     // Edit dan update pendaftaran (hanya untuk status pending)
     Route::get('/pendaftaran/{pendaftaran}/edit', [PendaftaranMagangController::class, 'edit'])
         ->name('pendaftaran.edit');
