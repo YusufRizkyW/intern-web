@@ -17,6 +17,14 @@ class EditPendaftaranMagang extends EditRecord
             //     ->label('Hapus')
             //     ->icon('heroicon-o-trash')
             //     ->color('warning'),
+            
+            Actions\Action::make('info')
+                ->label('💡 Tip: Buat kuota magang sebelum menerima pendaftar')
+                ->disabled()
+                ->view('components.alert-filament')
+                ->viewData([
+                    'message' => '💡 Tip: Pastikan membuat kuota magang sebelum menerima pendaftar'
+                ])
         ];
     }
 }

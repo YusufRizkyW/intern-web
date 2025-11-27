@@ -52,7 +52,7 @@ class PendaftaranMagangObserver
     protected function buildMessage(PendaftaranMagang $p, $oldStatus, $newStatus): string
     {
         $nama = $p->nama_lengkap ?? 'Peserta';
-        $siteName = config('app.name', 'MagangBPSGresik');
+        $siteName = config('app.name');
         $base = "Halo {$nama},\nStatus pendaftaran magang Anda di {$siteName} telah berubah.";
 
         switch ($newStatus) {
@@ -61,13 +61,13 @@ class PendaftaranMagangObserver
             case 'diterima':
                 return $base . "\nStatus: *Diterima*\nSelamat! Pendaftaran Anda telah diterima. Cek halaman *Status Pendaftaran* untuk detail selanjutnya.";
             case 'ditolak':
-                return $base . "\nStatus: *Ditolak*\nMaaf, pendaftaran Anda tidak dapat kami terima. Alasan: " . ($p->catatan_admin ?? 'Tidak ada keterangan.');
+                return $base . "\nStatus: *Ditolak*\nMaaf, pendaftaran Anda tidak dapat kami terima. \nAlasan: " . ($p->catatan_admin ?? 'Tidak ada keterangan.');
             case 'aktif':
                 return $base . "\nStatus: *Sedang Magang (Aktif)*\nInformasi lebih lanjut silahkan cek *Status Pendaftaran* atau WA.";
             case 'selesai':
                 return $base . "\nStatus: *Selesai*\nTerima kasih sudah melaksanakan magang. Semoga pengalaman bermanfaat!";
             case 'batal':
-                return $base . "\nStatus: *Dibatalkan*\nPendaftaran magang Anda telah dibatalkan. Alasan: " . ($p->catatan_admin ?? 'Tidak ada keterangan.');
+                return $base . "\nStatus: *Dibatalkan*\nPendaftaran magang Anda telah dibatalkan. \nAlasan: " . ($p->catatan_admin ?? 'Tidak ada keterangan.');
             default:
                 return $base . "\nStatus: {$newStatus}";
         }
